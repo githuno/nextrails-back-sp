@@ -6,7 +6,7 @@
 # Read more: https://github.com/cyu/rack-cors
 
 # 環境変数を呼び出す
-port = ENV['PORT1']
+port = ENV['PORT_FRONT']
 # ポート番号を切り出す
 hostp = port.split(':')[0] || port
 
