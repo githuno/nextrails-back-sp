@@ -1,3 +1,4 @@
+/.env
 # Ignore key
 *.key
 *Key
