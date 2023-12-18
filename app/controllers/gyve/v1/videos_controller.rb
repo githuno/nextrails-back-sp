@@ -10,6 +10,8 @@ class Gyve::V1::VideosController < ApplicationController
     end
 
 def create
+    object = ImageObject.find_or_create_by(id: params[:object_id])
+
     begin
         s3_key = "#{params[:object_id]}/#{params[:image_path]}"
         template_Image_and_Html_upload(s3_key)

@@ -10,7 +10,7 @@ class Gyve::V1::ImagesController < ApplicationController
   end
 
   def create
-    object = ImageObject.find_or_initialize_by(id: params[:object_id])
+    object = ImageObject.find_or_create_by(id: params[:object_id])
 
     if params[:image_data]
       image_bytes = Base64.decode64(params[:image_data])
