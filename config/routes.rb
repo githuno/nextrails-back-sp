@@ -8,7 +8,9 @@ Rails.application.routes.draw do
 
   namespace :gyve do
     namespace :v1 do
-      post '/get_images', to: 'get_images#image'
+      # post '/get_images', to: 'get_images#image'
+      post '/get_images', to: 'images#show'
+      post '/post_image', to: 'images#create'
     end
   end
 
