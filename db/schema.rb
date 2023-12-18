@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_17_111600) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_18_071848) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -52,7 +52,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_17_111600) do
   create_table "images", id: :bigint, default: -> { "nextval('public.images_id_seq'::REGCLASS)" }, force: :cascade do |t|
     t.uuid "object_id"
     t.string "image_path", null: false
-    t.bigint "updated_by"
+    t.string "updated_by"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
   end
