@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background: #000;
+}
+
+.video-container {
+  position: relative;
+  width: calc(100% - 50px);
+  height: calc(100vh - 50px);
+  overflow: hidden;
+}
+
+.video-container video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-aspect-ratio: 16/9) {
+  .video-container video {
+    height: 100%;
+    width: auto;
+  }
+}
+
+@media (min-aspect-ratio: 16/9) {
+  .video-container video {
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-aspect-ratio: 9/16) {
+  .video-container video {
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (min-aspect-ratio: 9/16) {
+  .video-container video {
+    height: 100%;
+    width: auto;
+  }
+}
+
+    </style>
+</head>
+<body>
+    <div class="video-container">
+      <video id="videoPlayer" controls preload="auto">
+            <source src={url}>
+        </video>
+    </div>
+</body>
+</html>
