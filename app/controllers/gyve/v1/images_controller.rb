@@ -16,7 +16,7 @@ class Gyve::V1::ImagesController < ApplicationController
       image_bytes = Base64.decode64(params[:image_data])
       io = StringIO.new(image_bytes)
       filename = "#{Time.now.strftime('%Y%m%d%H%M%S')}.png"
-      key = "#{params[:object_id]}/#{filename}"
+      key = "#{object.id}/#{filename}"
       image_path = "#{ENV['S3_PUBLIC_URL']}/#{key}"
       image = Image.new(object_id: object.id, image_path: image_path, updated_by: params[:user_id]) 
       image.file.attach(io: io, key: key, filename: filename, content_type: 'image/png')

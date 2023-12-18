@@ -13,11 +13,11 @@ def create
     object = ImageObject.find_or_create_by(id: params[:object_id])
 
     begin
-        s3_key = "#{params[:object_id]}/#{params[:image_path]}"
+        s3_key = "#{object.id}/#{params[:image_path]}"
         template_Image_and_Html_upload(s3_key)
         id = params[:image_path].gsub(".mp4", "")
         image_path = "#{ENV['S3_PUBLIC_URL']}/#{s3_key.gsub(".mp4", ".png")}"
-        Image.create(object_id: params[:object_id], image_path: image_path, updated_by: params[:user_id])
+        Image.create(object_id: object.id, image_path: image_path, updated_by: params[:user_id])
         render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => id, 'path' => image_path }] }
     rescue StandardError => e
         Rails.logger.error "Error video uploading process: #{e}"
