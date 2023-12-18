@@ -248,7 +248,7 @@ DEPENDENCIES
   image_processing (~> 1.2)
   puma (~> 5.0)
   rack-cors
-  rails (~> 7.0.3)
+  rails (~> 7.0.5)
   rubocop (~> 1.29)
   rubocop-performance
   rubocop-rails
