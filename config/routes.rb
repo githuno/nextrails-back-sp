@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
+  get '/', to: 'hello#create'
   namespace :api do
-    get '/hello', to: 'hello#create'
     namespace :v1 do
       resources :posts, only: [:index, :show, :create, :update, :destroy]
     end
