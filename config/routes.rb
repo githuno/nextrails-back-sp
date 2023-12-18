@@ -8,8 +8,7 @@ Rails.application.routes.draw do
 
   namespace :gyve do
     namespace :v1 do
-      post '/post/:method', to: 'posts#handle_gyve_request'
-      get '/post/:method', to: 'posts#handle_gyve_request'
+      post '/get_images', to: 'get_images#image'
     end
   end
 

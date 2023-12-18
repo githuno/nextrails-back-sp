@@ -1,5 +1,5 @@
-class Gyve::V1::PostsController < ApplicationController
-  def handle_gyve_request
+class Gyve::V1::GetImagesController < ApplicationController
+  def image
     object_id = params[:object_id]
     cnt = params[:cnt].to_i
 
