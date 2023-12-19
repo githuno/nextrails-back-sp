@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       resources :posts, only: [:index, :show, :create, :update, :destroy]
     end
   end
+  resources :posts
 
   namespace :gyve do
     namespace :v1 do
@@ -14,9 +15,8 @@ Rails.application.routes.draw do
       post '/del_image', to: 'images#destroy'
       post '/get_presignedUrl', to: 'videos#pre'
       post '/video_up', to: 'videos#create'
-      post '/get_objects', to: 'object#index'
+      post '/get_objects', to: 'objects#index'
     end
   end
-
-  resources :posts
+  
 end
