@@ -41,7 +41,7 @@ class Gyve::V1::VideosController < ApplicationController
         # png file
         png_name = "#{@base_name}.png"
         png_key = "#{obj_id}/#{png_name}"
-        png_template = File.read("/app/public/template.png")
+        png_template = File.read(Rails.root.join("public", "template.png"))
         image = Image.find_by(image_path: image_path)
         puts("*************** image.id: #{image.id}") # debug
         puts("*************** image.file: #{image.file}") # debug
