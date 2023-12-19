@@ -35,11 +35,12 @@ class Gyve::V1::VideosController < ApplicationController
         # Upload image file
         image_path = Rails.root.join('public', 'template.png')
         image_key = key.gsub(".mp4", ".png")
-        
         puts("**************** image_key : #{image_key}") # DEBUG
         image = Image.new
+        puts("**************** image : #{image}") # DEBUG
         image.file.attach(io: File.open(image_path, 'rb'), filename: image_key, content_type: 'image/png')
         image.save!
+        puts("**************** success") # DEBUG
 
         # Generate and upload HTML
         html_path = Rails.root.join('public', 'template.html')
