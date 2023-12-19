@@ -15,14 +15,13 @@ class Image < ApplicationRecord
   def delete_related_s3files
     s3 = s3_resource
 
-    base_name = file.key.gsub(ENV['S3_PUBLIC_URL'], '').chomp(File.extname(file.key))
-    puts("*************** base_name.length: #{base_name.length}") # debug
+    obj_id = self.object_id
+    base_name = self.image_path.split('/').last.sub(/.[^.]+\z/, '')
     return unless base_name.length == VIDEO_ID_LENGTH
 
     extensions = ['.html', '.mp4']
     extensions.each do |extension|
-      puts("*************** base_name: #{base_name}") # debug
-      key = "#{base_name}#{extension}"
+      key = "#{obj_id}/#{base_name}#{extension}"
       s3.bucket(ENV['S3_BUCKET']).object(key).delete
     end
   end
