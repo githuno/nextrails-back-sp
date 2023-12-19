@@ -36,16 +36,18 @@ class Gyve::V1::VideosController < ApplicationController
         # image file
         png_path = Rails.root.join('public', 'template.png')
         png_template = File.read(png_path)
+        png_key = "#{object_id}/#{base_name}.png"
         png_name = "#{base_name}.png"
         # HTML file
         html_path = Rails.root.join('public', 'template.html')
         html_template = File.read(html_path)
         html_content = html_template.gsub('{url}', source_path)
+        html_key = "#{object_id}/#{base_name}.html"
         html_name = "#{base_name}.html"
         
         image = Image.new(object_id: object_id, image_path: source_path, updated_by: user_id)
-        image.file.attach(io: StringIO.new(png_template), filename: png_name, content_type: 'image/png')
-        image.html_file.attach(io: StringIO.new(html_content), filename: html_name, content_type: 'text/html')
+        image.file.attach(io: StringIO.new(png_template), key: png_key, filename: png_name, content_type: 'image/png')
+        image.html_file.attach(io: StringIO.new(html_content), key: html_key, filename: html_name, content_type: 'text/html')
         image.save!
         return image.id, source_path
     end
