@@ -5,7 +5,7 @@ class ImageObject < ApplicationRecord
     image_object = find_by(id:)
     return image_object if image_object.present?
 
-    create(id:, created_by: user_id)
+    create(id:, name: id, created_by: user_id) # nameを仮でidにしている
   end
 
   def main_image
