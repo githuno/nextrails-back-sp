@@ -20,6 +20,7 @@ class Image < ApplicationRecord
 
     extensions = ['.html', '.mp4']
     extensions.each do |extension|
+      puts("*************** base_name: #{base_name}") # debug
       key = "#{base_name}#{extension}"
       s3.bucket(ENV['S3_BUCKET']).object(key).delete
     end
