@@ -16,6 +16,7 @@ class Image < ApplicationRecord
     s3 = s3_resource
 
     base_name = file.key.gsub(ENV['S3_PUBLIC_URL'], '').chomp(File.extname(file.key))
+    puts("*************** base_name.length: #{base_name.length}") # debug
     return unless base_name.length == VIDEO_ID_LENGTH
 
     extensions = ['.html', '.mp4']
