@@ -2,16 +2,20 @@ class Gyve::V1::VideosController < ApplicationController
     require 'aws-sdk-s3'
     
     def pre
-        s3_key = "#{params[:object_id]}/#{params[:image_path]}"
-        presigned_url = generate_presigned_url(s3_key)
-        render json: { 'msg' => 'success', 'result' => [{ 'id' => '', 'path' => presigned_url }] }
-    rescue StandardError => e
-        Rails.logger.error "Error generating presigned URL: #{e}"
-        render json: { 'detail' => 'Internal Server Error' }, status: :internal_server_error
+        object = ImageObject.find_or_create_by(id: params[:object_id], user_id: params[:user_id])
+        
+        begin
+            s3_key = "#{params[:object_id]}/#{params[:image_path]}"
+            presigned_url = generate_presigned_url(s3_key)
+            render json: { 'msg' => 'success', 'result' => [{ 'id' => '', 'path' => presigned_url }] }
+        rescue StandardError => e
+            Rails.logger.error "Error generating presigned URL: #{e}"
+            render json: { 'detail' => 'Internal Server Error' }, status: :internal_server_error
     end
 
     def create
         object = ImageObject.find_or_create_by(id: params[:object_id], user_id: params[:user_id])
+
         begin
             s3_key = "#{object.id}/#{params[:image_path]}"
             template_Image_and_Html_upload(s3_key)
