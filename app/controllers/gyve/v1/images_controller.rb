@@ -3,7 +3,7 @@ class Gyve::V1::ImagesController < ApplicationController
 
   def show
     images = Image.where(object_id: params[:object_id]).order(updated_at: :desc)
-    images = images.limit(params[:cnt].to_i) if params[:cnt].to_i.positive?
+    images = images.limit(params[:image_cnt].to_i) if params[:image_cnt].to_i.positive?
     render json: { 'result' => images.map { |image| { 'id' => File.basename(image.image_path, '.*'), 'path' => image.image_path } }, 'msg' => 'Success' }
   rescue StandardError => e
     render json: { 'detail' => "get_imagesに失敗: #{e}" }, status: :internal_server_error
