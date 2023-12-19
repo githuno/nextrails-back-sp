@@ -27,7 +27,9 @@ class Gyve::V1::ObjectsController < ApplicationController
   
         # S3からオブジェクトを削除
         object.images.each do |image|
+          puts("*************** image: #{image}") # debug
           image.delete_related_s3files
+          puts("*************** related file is delete") # debug
           image.purge if image.attached?
         end
   
