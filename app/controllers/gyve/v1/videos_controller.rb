@@ -4,7 +4,7 @@ class Gyve::V1::VideosController < ApplicationController
     def pre_create
         obj = ImageObject.find_or_create_by(id: params[:object_id], user_id: params[:user_id])
         usr_id = params[:user_id]
-        base_name = "#{Time.now.strftime('%Y%m%d%H%M%S')}"
+        base_name = params[:image_path].split("/")[-1]
         image_path = "#{ENV['S3_PUBLIC_URL']}/#{obj.id}/#{base_name}.png"
 
         begin
@@ -22,7 +22,6 @@ class Gyve::V1::VideosController < ApplicationController
     def create
         image_base_path = params[:image_path].split("/")[-2..].join("/").sub(/\.mp4\?.*$/, '.png')
         image_path = "#{ENV['S3_PUBLIC_URL']}/#{image_base_path}"
-        puts("************ image_path: #{image_path} ") # debug
         begin
             res = template_Image_and_Html_upload(image_path)
             render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => res[0], 'path' => res[1] }] }   
