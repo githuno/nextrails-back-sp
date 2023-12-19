@@ -53,8 +53,9 @@ class Gyve::V1::VideosController < ApplicationController
         image = Image.find_by(image_path: image_path)
         raise StandardError, 'Image not found' unless image
 
-        image.file.attach(io: StringIO.new(png_template), key: png_key, filename: png_name, content_type: 'image/png')
         image.attach_html_file(html_content, html_key, html_name)
+        image.file.attach(io: StringIO.new(png_template), key: png_key, filename: png_name, content_type: 'image/png')
+        
         image.save!
         return image.id, image.image_path
     end
