@@ -32,9 +32,7 @@ class Gyve::V1::ImagesController < ApplicationController
 
   def destroy
     if @image
-      # もしimage.idの文字列長が36文字であれば、video.destroyを実行する
-      # if @image.id.length == 36
-      #   @image.vide
+      @image.delete_related_files
       @image.file.purge
       @image.destroy
       render json: { 'msg' => 'Image deleted successfully' }
