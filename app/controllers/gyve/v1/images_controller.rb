@@ -34,7 +34,7 @@ class Gyve::V1::ImagesController < ApplicationController
     if @Image
       @image.file.purge
       # if @image.id.length == 36
-      #   @image.video.destroy
+      #   
       @image.destroy
       render json: { 'msg' => 'Image deleted successfully' }
     else
