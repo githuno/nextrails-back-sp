@@ -52,7 +52,7 @@ class Gyve::V1::VideosController < ApplicationController
 
     def generate_presigned_url(key)
         s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
-        obj = s3.bucket(ENV['S3_BUCKET']).obj(key)
+        obj = s3.bucket(ENV['S3_BUCKET']).object(key)
         obj.presigned_url(:put, expires_in: 3600)
     end
 end
