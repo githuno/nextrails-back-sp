@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       post '/del_image', to: 'images#destroy'
       post '/get_presignedUrl', to: 'videos#pre'
       post '/video_up', to: 'videos#create'
+      post '/get_objects', to: 'object#index'
     end
   end
 
