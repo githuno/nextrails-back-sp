@@ -1,13 +1,17 @@
 class Gyve::V1::VideosController < ApplicationController
     require 'aws-sdk-s3'
     
-    def pre
+    def pre_create
         obj = ImageObject.find_or_create_by(id: params[:object_id], user_id: params[:user_id])
+        usr_id = params[:user_id]
+        base_name = "#{Time.now.strftime('%Y%m%d%H%M%S')}"
+        image_path = "#{ENV['S3_PUBLIC_URL']}/#{obj.id}/#{base_name}.png"
 
         begin
-            s3_key = "#{obj.id}/#{params[:image_path]}"
+            Image.create(object_id: obj.id, image_path: image_path, updated_by: usr_id)
+            s3_key = "#{obj.id}/#{base_name}.mp4"
             presigned_url = generate_presigned_url(s3_key)
-            render json: { 'msg' => 'success', 'result' => [{ 'id' => '', 'path' => presigned_url }] }
+            render json: { 'msg' => 'success', 'result' => [{ 'id' => image.id, 'path' => presigned_url }] }
         rescue StandardError => e
             Rails.logger.error "Error generating presigned URL: #{e}"
             render json: { 'detail' => 'Internal Server Error' }, status: :internal_server_error
@@ -15,11 +19,11 @@ class Gyve::V1::VideosController < ApplicationController
     end
 
     def create
-        obj_id = params[:object_id] # preメソッドによってすでにテーブルは存在する
-        src_name = params[:image_path]
+        image_path = params[:image_path].gsub(/\.mp4$/, '.png')
+        image = Image.find_by(image_path: image_path)
         begin
-            result = template_Image_and_Html_upload(src_name, obj_id, params[:user_id])
-            render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => result[0], 'path' => result[1] }] }   
+            res = template_Image_and_Html_upload(image)
+            render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => res[0], 'path' => res[1] }] }   
         rescue StandardError => e
             Rails.logger.error "Error video uploading process: #{e}"
             render json: { 'detail' => 'Internal Server Error' }, status: :internal_server_error
@@ -28,28 +32,27 @@ class Gyve::V1::VideosController < ApplicationController
     
     private
 
-    def template_Image_and_Html_upload(source_name, object_id, user_id)
-        base_name = File.basename(source_name, '.*')
-        source_key = "#{object_id}/#{source_name}"
-        source_path = "#{ENV['S3_PUBLIC_URL']}/#{source_key}"
+    def template_Image_and_Html_upload(image)
+        base_name = File.basename(image.image_path, '.*')
+        video_path = image.image_path.gsub(/\.png$/, '.mp4')
 
         # image file
         png_path = Rails.root.join('public', 'template.png')
         png_template = File.read(png_path)
-        png_key = "#{object_id}/#{base_name}.png"
         png_name = "#{base_name}.png"
+        png_key = "#{image.object_id}/#{png_name}"
+        
         # HTML file
         html_path = Rails.root.join('public', 'template.html')
         html_template = File.read(html_path)
-        html_content = html_template.gsub('{url}', source_path)
-        html_key = "#{object_id}/#{base_name}.html"
+        html_content = html_template.gsub('{url}', video_path)
         html_name = "#{base_name}.html"
+        html_key = "#{image.object_id}/#{html_name}"
         
-        image = Image.new(object_id: object_id, image_path: source_path, updated_by: user_id)
         image.file.attach(io: StringIO.new(png_template), key: png_key, filename: png_name, content_type: 'image/png')
         image.html_file.attach(io: StringIO.new(html_content), key: html_key, filename: html_name, content_type: 'text/html')
         image.save!
-        return image.id, source_path
+        return image.id, image.image_path
     end
 
     def generate_presigned_url(key)
