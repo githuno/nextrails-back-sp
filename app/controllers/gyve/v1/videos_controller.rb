@@ -16,13 +16,10 @@ class Gyve::V1::VideosController < ApplicationController
 
     def create
         obj_id = params[:object_id] # preメソッドによってすでにテーブルは存在する
+        src_name = params[:image_path]
         begin
-            s3_key = "#{obj_id}/#{params[:image_path]}"
-            template_Image_and_Html_upload(s3_key)
-            id = params[:image_path].gsub(".mp4", "")
-            image_path = "#{ENV['S3_PUBLIC_URL']}/#{s3_key.gsub(".mp4", ".png")}"
-            Image.create(object_id: obj_id, image_path: image_path, updated_by: params[:user_id])
-            render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => id, 'path' => image_path }] }
+            result = template_Image_and_Html_upload(src_name, obj_id, params[:user_id])
+            render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => result[0], 'path' => result[1] }] }   
         rescue StandardError => e
             Rails.logger.error "Error video uploading process: #{e}"
             render json: { 'detail' => 'Internal Server Error' }, status: :internal_server_error
@@ -31,25 +28,26 @@ class Gyve::V1::VideosController < ApplicationController
     
     private
 
-    def template_Image_and_Html_upload(key)
-        # Upload image file
-        image_path = Rails.root.join('public', 'template.png')
-        image_key = key.gsub(".mp4", ".png")
-        puts("**************** image_key : #{image_key}") # DEBUG
-        image = Image.new
-        puts("**************** image : #{image}") # DEBUG
-        image.file.attach(io: File.open(image_path, 'rb'), filename: image_key, content_type: 'image/png')
-        image.save!
-        puts("**************** success") # DEBUG
+    def template_Image_and_Html_upload(source_name, object_id, user_id)
+        base_name = File.basename(source_name, '.*')
+        source_key = "#{object_id}/#{source_name}"
+        source_path = "#{ENV['S3_PUBLIC_URL']}/#{source_key}"
 
-        # Generate and upload HTML
+        # image file
+        png_path = Rails.root.join('public', 'template.png')
+        png_template = File.read(png_path)
+        png_name = "#{base_name}.png"
+        # HTML file
         html_path = Rails.root.join('public', 'template.html')
         html_template = File.read(html_path)
-        video_url = "https://pub-b5e3fa5caf8549b4bf8bff1ac7c7eee8.r2.dev/#{key}"
-        html_content = html_template.gsub('{url}', video_url)
-        html_key = key.gsub(".mp4", ".html")
-        image.html_file.attach(io: StringIO.new(html_content), filename: html_key, content_type: 'text/html')
+        html_content = html_template.gsub('{url}', source_path)
+        html_name = "#{base_name}.html"
+        
+        image = Image.new(object_id: object_id, image_path: source_path, updated_by: user_id)
+        image.file.attach(io: StringIO.new(png_template), filename: png_name, content_type: 'image/png')
+        image.html_file.attach(io: StringIO.new(html_content), filename: html_name, content_type: 'text/html')
         image.save!
+        return image.id, source_path
     end
 
     def generate_presigned_url(key)
