@@ -1,9 +1,10 @@
 class ImageObject < ApplicationRecord
-  has_many :images
+  has_many :images, foreign_key: :object_id
 
   def self.find_or_create_by(id:, user_id:)
     image_object = find_by(id:)
     return image_object if image_object.present?
+
     create(id:, created_by: user_id)
   end
 

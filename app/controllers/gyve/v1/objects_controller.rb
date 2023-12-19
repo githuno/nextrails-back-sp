@@ -20,4 +20,4 @@ class Gyve::V1::ObjectsController < ApplicationController
       Rails.logger.error "Error: #{e}"
       render json: { 'msg' => 'error' }, status: :internal_server_error
     end
-  end
+end
