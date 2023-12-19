@@ -11,7 +11,7 @@ class Gyve::V1::VideosController < ApplicationController
             Image.create(object_id: obj.id, image_path: image_path, updated_by: usr_id)
             s3_key = "#{obj.id}/#{base_name}.mp4"
             presigned_url = generate_presigned_url(s3_key)
-            render json: { 'msg' => 'success', 'result' => [{ 'id' => image.id, 'path' => presigned_url }] }
+            render json: { 'msg' => 'success', 'result' => [{ 'id' => obj.id, 'path' => presigned_url }] }
         rescue StandardError => e
             Rails.logger.error "Error generating presigned URL: #{e}"
             render json: { 'detail' => 'Internal Server Error' }, status: :internal_server_error
