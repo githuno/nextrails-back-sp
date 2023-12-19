@@ -12,7 +12,7 @@ class Image < ApplicationRecord
     obj.presigned_url(:put, expires_in: 3600)
   end
 
-  def delete_related_files
+  def delete_related_s3files
     s3 = s3_resource
 
     base_name = file.key.gsub(ENV['S3_PUBLIC_URL'], '').chomp(File.extname(file.key))

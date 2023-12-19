@@ -20,4 +20,26 @@ class Gyve::V1::ObjectsController < ApplicationController
       Rails.logger.error "Error: #{e}"
       render json: { 'msg' => 'error' }, status: :internal_server_error
     end
+
+    def destroy
+      begin
+        object = ImageObject.find(params[:object_id])
+  
+        # S3からオブジェクトを削除
+        object.images.each do |image|
+          image.delete_related_s3files
+          image.purge if image.attached?
+        end
+  
+        # データベースからオブジェクトを削除
+        object.destroy
+  
+        render json: { 'msg' => 'S3 objects and DB record deleted successfully.' }
+      rescue ActiveRecord::RecordNotFound
+        render json: { 'msg' => 'Error: Object not found in DB.' }, status: :not_found
+      rescue => e
+        Rails.logger.error "Error deleting objects from S3 and DB: #{e}"
+        render json: { 'msg' => "Error deleting objects from S3 and DB: #{e}" }, status: :internal_server_error
+      end
+    end
 end

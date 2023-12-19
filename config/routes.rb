@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       post '/get_presignedUrl', to: 'videos#pre_create'
       post '/video_up', to: 'videos#create'
       post '/get_objects', to: 'objects#index'
+      post '/del_object', to: 'objects#destroy
     end
   end
   

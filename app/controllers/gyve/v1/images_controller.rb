@@ -32,7 +32,7 @@ class Gyve::V1::ImagesController < ApplicationController
 
   def destroy
     if @image
-      @image.delete_related_files
+      @image.delete_related_s3files
       @image.file.purge
       @image.destroy
       render json: { 'msg' => 'Image deleted successfully' }
