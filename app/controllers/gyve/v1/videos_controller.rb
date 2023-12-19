@@ -15,15 +15,15 @@ class Gyve::V1::VideosController < ApplicationController
     end
 
     def create
-        obj = params[:object_id] # preメソッドによってすでにテーブルは存在する
+        obj_id = params[:object_id] # preメソッドによってすでにテーブルは存在する
         begin
-            s3_key = "#{obj.id}/#{params[:image_path]}"
+            s3_key = "#{obj_id}/#{params[:image_path]}"
             puts("**************** s3_key: #{s3_key}") # debug
             template_Image_and_Html_upload(s3_key)
             puts("**************** template_Image_and_Html_upload done") # debug
             id = params[:image_path].gsub(".mp4", "")
             image_path = "#{ENV['S3_PUBLIC_URL']}/#{s3_key.gsub(".mp4", ".png")}"
-            Image.create(object_id: obj.id, image_path: image_path, updated_by: params[:user_id])
+            Image.create(object_id: obj_id, image_path: image_path, updated_by: params[:user_id])
             render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => id, 'path' => image_path }] }
         rescue StandardError => e
             Rails.logger.error "Error video uploading process: #{e}"
