@@ -40,10 +40,8 @@ class Gyve::V1::VideosController < ApplicationController
         puts("*************** obj_id: #{obj_id}") # debug
         # png file
         png_name = "#{@base_name}.png"
-        puts("*************** png_name: #{png_name}") # debug
         png_key = "#{obj_id}/#{png_name}"
-        puts("*************** png_key: #{png_key}") # debug
-        png_template = File.read(ENV['TEMPLATE_PNG_PATH'])
+        png_template = File.read("/app/public/template.png")
         image = Image.find_by(image_path: image_path)
         puts("*************** image.id: #{image.id}") # debug
         puts("*************** image.file: #{image.file}") # debug
