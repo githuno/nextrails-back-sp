@@ -31,12 +31,9 @@ class Gyve::V1::VideosController < ApplicationController
         # Upload image file
         image_path = Rails.root.join('public', 'template.png')
         image_key = key.gsub(".mp4", ".png")
-        image = ActiveStorage::Blob.create_after_upload!(
-            io: File.open(image_path, 'rb'),
-            filename: image_key,
-            content_type: 'image/png'
-        )
-        image.upload
+        image = Image.new
+        image.file.attach(io: File.open(image_path, 'rb'), filename: image_key, content_type: 'image/png')
+        image.save!
 
         # Generate and upload HTML
         html_path = Rails.root.join('public', 'template.html')
@@ -44,12 +41,9 @@ class Gyve::V1::VideosController < ApplicationController
         video_url = "https://pub-b5e3fa5caf8549b4bf8bff1ac7c7eee8.r2.dev/#{key}"
         html_content = html_template.gsub('{url}', video_url)
         html_key = key.gsub(".mp4", ".html")
-        html = ActiveStorage::Blob.create_after_upload!(
-            io: StringIO.new(html_content),
-            filename: html_key,
-            content_type: 'text/html'
-        )
-        html.upload
+        html = Html.new
+        html.file.attach(io: StringIO.new(html_content), filename: html_key, content_type: 'text/html')
+        html.save!
     end
 
     def generate_presigned_url(key)
