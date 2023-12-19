@@ -20,7 +20,7 @@ class Gyve::V1::VideosController < ApplicationController
     end
 
     def create
-        image_base_path = params[:image_path].split("/")[-2..].join("/").gsub(/\.mp4$/, '.png')
+        image_base_path = params[:image_path].split("/")[-2..].join("/").sub(/\.mp4\?.*$/, '.png')
         image_path = "#{ENV['S3_PUBLIC_URL']}/#{image_base_path}"
         puts("************ image_path: #{image_path} ") # debug
         begin
