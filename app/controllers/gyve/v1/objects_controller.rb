@@ -15,7 +15,7 @@ class Gyve::V1::ObjectsController < ApplicationController
           "cdt3d_msg": obj.condition3d_info[:message]
         }
       end
-      render json: { 'msg' => 'success', 'objects' => object_info }
+      render json: { 'msg' => 'success', 'results' => object_info }
     rescue StandardError => e
       Rails.logger.error "Error: #{e}"
       render json: { 'msg' => 'error' }, status: :internal_server_error
