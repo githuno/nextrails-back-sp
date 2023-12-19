@@ -19,11 +19,12 @@ class Gyve::V1::VideosController < ApplicationController
     end
 
     def create
-        image_base_path = params[:image_path].split("/")[-2..].join("/").sub(/\.mp4\?.*$/, '.png')
-        image_path = "#{ENV['S3_PUBLIC_URL']}/#{image_base_path}"
+        image_base_path = params[:image_path].split("/")[-1].sub(/\.mp4\?.*$/, '.png')
+        obj_id = params[:object_id]
+        image_path = "#{ENV['S3_PUBLIC_URL']}/#{obj_id}/#{image_base_path}"
         begin
-            res = sample_upload(image_path)
-            render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => res[0], 'path' => res[1] }] }   
+            sample_upload(image_path)
+            render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => image_base_path, 'path' => image_path }] }   
         rescue StandardError => e
             Rails.logger.error "Error video uploading process: #{e}"
             render json: { 'detail' => 'Internal Server Error' }, status: :internal_server_error
@@ -46,7 +47,6 @@ class Gyve::V1::VideosController < ApplicationController
         raise StandardError, 'Image not found' unless image
         image.file.attach(io: StringIO.new(png_template), key: png_key, filename: png_name, content_type: 'image/png')
         image.save!
-        return image.id, image.image_path
     end
 
     def generate_presigned_url(key)
