@@ -18,9 +18,7 @@ class Gyve::V1::VideosController < ApplicationController
         obj_id = params[:object_id] # preメソッドによってすでにテーブルは存在する
         begin
             s3_key = "#{obj_id}/#{params[:image_path]}"
-            puts("**************** s3_key: #{s3_key}") # debug
             template_Image_and_Html_upload(s3_key)
-            puts("**************** template_Image_and_Html_upload done") # debug
             id = params[:image_path].gsub(".mp4", "")
             image_path = "#{ENV['S3_PUBLIC_URL']}/#{s3_key.gsub(".mp4", ".png")}"
             Image.create(object_id: obj_id, image_path: image_path, updated_by: params[:user_id])
@@ -37,6 +35,8 @@ class Gyve::V1::VideosController < ApplicationController
         # Upload image file
         image_path = Rails.root.join('public', 'template.png')
         image_key = key.gsub(".mp4", ".png")
+        
+        puts("**************** image_key : #{image_key}") # DEBUG
         image = Image.new
         image.file.attach(io: File.open(image_path, 'rb'), filename: image_key, content_type: 'image/png')
         image.save!
