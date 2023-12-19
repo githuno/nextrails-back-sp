@@ -22,6 +22,7 @@ class Gyve::V1::VideosController < ApplicationController
     def create
         image_base_path = params[:image_path].split("/")[-2..].join("/").gsub(/\.mp4$/, '.png')
         image_path = "#{ENV['S3_PUBLIC_URL']}/#{image_base_path}"
+        puts("************ image_path: #{image_path} ") # debug
         begin
             res = template_Image_and_Html_upload(image_path)
             render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => res[0], 'path' => res[1] }] }   
