@@ -3,7 +3,7 @@ class Gyve::V1::VideosController < ApplicationController
     
     def pre
         object = ImageObject.find_or_create_by(id: params[:object_id], user_id: params[:user_id])
-        
+
         begin
             s3_key = "#{params[:object_id]}/#{params[:image_path]}"
             presigned_url = generate_presigned_url(s3_key)
@@ -45,9 +45,8 @@ class Gyve::V1::VideosController < ApplicationController
         video_url = "https://pub-b5e3fa5caf8549b4bf8bff1ac7c7eee8.r2.dev/#{key}"
         html_content = html_template.gsub('{url}', video_url)
         html_key = key.gsub(".mp4", ".html")
-        html = Html.new
-        html.file.attach(io: StringIO.new(html_content), filename: html_key, content_type: 'text/html')
-        html.save!
+        image.html_file.attach(io: StringIO.new(html_content), filename: html_key, content_type: 'text/html')
+        image.save!
     end
 
     def generate_presigned_url(key)
