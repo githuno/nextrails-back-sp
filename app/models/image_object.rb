@@ -8,18 +8,18 @@ class ImageObject < ApplicationRecord
     create(id:, name: id, created_by: user_id) # nameを仮でidにしている
   end
 
-  def main_image
+def main_image
     # もしimages.first&idが36文字ならimage_pathの拡張子をmp4に変更して返す
     # それ以外ならimage_pathを返す
     # ただし、image_pathがnilの場合はnilを返す
     return nil if images.first.nil?
 
-    if images.first.id.length == 36
-      images.first.image_path.sub(/\.png\z/, '.mp4')
+    if images.first.id.to_s.length == 36
+        images.first.image_path.sub(/\.png\z/, '.mp4')
     else
-      images.first.image_path
+        images.first.image_path
     end
-  end
+end
 
   def condition3d_info
     if condition3d.nil?
