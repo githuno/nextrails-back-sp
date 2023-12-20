@@ -1,8 +1,9 @@
 class Gyve::V1::ObjectsController < ApplicationController
     def index
       user_id = params[:user_id]
-      objects = ImageObject.where(created_by: user_id)
+      objects = ImageObject.where(created_by: user_id).order(updated_at: :desc)
       object_info = objects.map do |obj|
+        obj.destroy if obj.images.empty? # imageが存在しないobjectは削除
         {
           "created_by": user_id,
           "id": obj.id,
