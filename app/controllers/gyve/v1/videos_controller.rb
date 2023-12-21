@@ -5,7 +5,7 @@ class Gyve::V1::VideosController < ApplicationController
         obj = ImageObject.find_or_create_by(id: params[:object_id], user_id: params[:user_id])
         usr_id = params[:user_id]
         s3_key = "#{obj.id}/#{@now}.mp4"
-        image_path = "#{ENV['S3_PUBLIC_URL']}/#{s3_key}.sub('.mp4', '.png')"
+        image_path = "#{ENV['S3_PUBLIC_URL']}/#{s3_key.sub('.mp4', '.png')}"
 
         begin
             image = Image.create(object_id: obj.id, image_path: image_path, updated_by: usr_id)
