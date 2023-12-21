@@ -9,17 +9,7 @@ class ImageObject < ApplicationRecord
   end
 
   def main_image
-    # もしimages.first&.image_pathのbasenameが36文字なら拡張子をmp4に変更して返す
-    # それ以外ならimage_pathを返す
-    # ただし、image_pathがnilの場合はnilを返す
-    return unless images.first&.image_path
-
-    basename = images.first.image_path.split('/').last.sub(/\.[^.]+\z/, '')
-    if basename.length == 36
-      images.first.image_path.sub('.png', '.mp4')
-    else
-      images.first.image_path
-    end
+    images.first&.image_path || ''
   end
 
   def condition3d_info

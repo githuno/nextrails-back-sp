@@ -1,9 +1,9 @@
 class Gyve::V1::ObjectsController < ApplicationController
     def index
       user_id = params[:user_id]
+      ImageObject.where(created_by: user_id).each { |obj| obj.destroy if obj.images.empty? } # imageが存在しないobjectは削除
       objects = ImageObject.where(created_by: user_id).order(updated_at: :desc)
       object_info = objects.map do |obj|
-        obj.destroy if obj.images.empty? # imageが存在しないobjectは削除
         {
           "created_by": user_id,
           "id": obj.id,
@@ -24,7 +24,7 @@ class Gyve::V1::ObjectsController < ApplicationController
 
     def destroy
       begin
-        object = ImageObject.find(params[:object_id])
+        object = ImageObject.includes(:images).find(params[:object_id])
   
         # S3からオブジェクトを削除
         object.images.each do |image|
