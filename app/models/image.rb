@@ -44,7 +44,7 @@ class Image < ApplicationRecord
 
     s3 = s3_resource
 
-    extensions = ['.html', '.mp4'] # 削除対象の拡張子
+    extensions = ['.png' '.html', '.mp4'] # 削除対象の拡張子
     extensions.each do |extension|
       key = "#{obj_id}/#{base_name}#{extension}"
       s3.bucket(ENV['S3_BUCKET']).object(key).delete
