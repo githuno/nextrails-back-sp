@@ -38,9 +38,9 @@ class Image < ApplicationRecord
 
   def delete_related_s3files
     obj_id = self.object_id
-    base_name = get_basename(self.image_path)
+    base_name = self.image_path.split('/').last.sub(/\.[^.]+\z/, '')
     # self.image_pathの拡張子がpngなら何もしない
-    return if File.extname(base_name) == '.png'
+    return if File.extname(self.image_path) == '.png'
 
     s3 = s3_resource
 
