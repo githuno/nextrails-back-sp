@@ -19,7 +19,11 @@ class Gyve::V1::VideosController < ApplicationController
 
     def create
         obj_id = params[:object_id]
-        base_name = get_basename(params[:image_path])
+        base_name = params[:image_path] ? get_basename(params[:image_path]) : nil
+        if base_name.nil?
+            render json: { 'detail' => 'image_path parameter is missing' }, status: :bad_request
+            return
+        end
         image_path = "#{ENV['S3_PUBLIC_URL']}/#{obj_id}/#{base_name}.mp4"
         begin
             sample_upload(obj_id, base_name)
@@ -32,15 +36,13 @@ class Gyve::V1::VideosController < ApplicationController
     
     private
 
-    
-
     def sample_upload(object_id, base_name)
         # png file
         png_key = "#{object_id}/#{base_name}.png"
         png_template = File.read(Rails.root.join("public", "template.png"))
         
-        image = Image.find_by(image_path: image_path)
-        image.file.attach(io: StringIO.new(png_template), key: png_key, filename: png_name, content_type: 'image/png')
+        image = Image.find_by(image_path: "#{ENV['S3_PUBLIC_URL']}/#{object_id}/#{base_name}.mp4")
+        image.file.attach(io: StringIO.new(png_template), key: png_key, filename: "#{base_name}.png", content_type: 'image/png')
     end
 
     def log_error(e)
