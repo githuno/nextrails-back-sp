@@ -26,7 +26,7 @@ class Gyve::V1::VideosController < ApplicationController
         end
         image_path = "#{ENV['S3_PUBLIC_URL']}/#{obj_id}/#{base_name}.mp4"
         begin
-            sample_upload(obj_id, base_name)
+            # sample_upload(obj_id, base_name)
             render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => base_name, 'path' => image_path }] }   
         rescue StandardError => e
             log_error(e)
@@ -36,14 +36,14 @@ class Gyve::V1::VideosController < ApplicationController
     
     private
 
-    def sample_upload(object_id, base_name)
-        # png file
-        png_key = "#{object_id}/#{base_name}.png"
-        png_template = File.read(Rails.root.join("public", "template.png"))
+    # def sample_upload(object_id, base_name) # filenameが日付のままupするとgaussianでもDLしてしまうため削除
+    #     # png file
+    #     png_key = "#{object_id}/#{base_name}.png"
+    #     png_template = File.read(Rails.root.join("public", "template.png"))
         
-        image = Image.find_by(image_path: "#{ENV['S3_PUBLIC_URL']}/#{object_id}/#{base_name}.mp4")
-        image.file.attach(io: StringIO.new(png_template), key: png_key, filename: "#{base_name}.png", content_type: 'image/png')
-    end
+    #     image = Image.find_by(image_path: "#{ENV['S3_PUBLIC_URL']}/#{object_id}/#{base_name}.mp4")
+    #     image.file.attach(io: StringIO.new(png_template), key: png_key, filename: "#{base_name}.png", content_type: 'image/png')
+    # end
 
     def log_error(e)
         Rails.logger.error "#{e.class} (#{e.message}):\n  #{e.backtrace.join("\n  ")}"
