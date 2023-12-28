@@ -2,6 +2,7 @@ require 'open3'
 require 'net/http'
 require 'uri'
 require 'json'
+require 'openssl'
 
 class ImageObject < ApplicationRecord
   has_many :images, foreign_key: :object_id, dependent: :destroy
@@ -111,17 +112,19 @@ class ImageObject < ApplicationRecord
 
   def req_new
     uri = URI.parse('https://isk221492--gs-gaussian.modal.run/create/ply')
-    http = Net::HTTP.new(uri.host, uri.port)
+    http = Net::HTTP.new(url.host, url.port) # HTTP通信を行う
+    http.use_ssl = true # SSL通信を行う
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE # 証明書の検証を行わない
     http.read_timeout = 60 # 60秒後にタイムアウト
     request = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
-    request.body = { created_by: created_by, id: id, iterations: 3000 }.to_json
+    request.body = { created_by:, id:, iterations: 3000 }.to_json
 
     begin
       response = http.request(request)
     rescue Net::ReadTimeout => e
       raise "Request timed out: #{e.message}"
     end
-    response.body
+    response.read_body
   end
   # <-----------------------------------------------------------------for Splats
 end
