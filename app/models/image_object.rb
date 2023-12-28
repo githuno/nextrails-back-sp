@@ -105,7 +105,6 @@ class ImageObject < ApplicationRecord
   def create_3d
     SplatJob.perform_later(:monitor_async, self)
     req_new
-    puts '>> REQUEST "3d create" to gaussian is done'
   rescue StandardError => e
     Rails.logger.error "Failed to create 3d: #{e.message}"
     raise "Failed to create 3d: #{e.message}"
@@ -155,9 +154,11 @@ class ImageObject < ApplicationRecord
     request.body = { created_by:, id:, iterations: 3000 }.to_json
 
     begin
+      puts '>> GAUSSIAN REQUEST is started'
       response = http.request(request)
+      puts '<< GAUSSIAN REQUEST is finished'
     rescue Net::ReadTimeout => e
-      raise "Request timed out: #{e.message}"
+      raise "Rails > GAUSSIAN Request timed out: #{e.message}"
     end
     response.read_body
   end

@@ -9,18 +9,18 @@ class SplatJob < ApplicationJob
 
   def self.monitor_async(image_object)
     initial_condition3d = image_object.condition3d
+    puts "monitoriing condition3d: initial = #{initial_condition3d}"
 
     15.times do |i|
-      puts "minitoriing condition3d: times = #{i}"
-      sleep 60 # 1分待つ
+      puts "monitoriing condition3d: times = #{i}"
       image_object.reload # 最新の状態を読み込む
-
       if image_object.condition3d != initial_condition3d
         puts "condition3d has changed: #{image_object.condition3d}"
         image_object.attach_splat
         image_object.update(condition3d: "10# #{ENV['S3_PUBLIC_URL']}/#{image_object.id}/output/a.splat")
         break
       end
+      sleep 60 # 1分待つ
     end
   end
 
