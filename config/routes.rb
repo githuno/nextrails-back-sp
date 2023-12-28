@@ -17,7 +17,7 @@ Rails.application.routes.draw do
       post '/video_up', to: 'videos#create'
       post '/get_objects', to: 'objects#index'
       post '/del_object', to: 'objects#destroy'
-      post '/post_3d', to: 'splats#create'
+      post '/create_3d', to: 'splats#create'
     end
   end
   
