@@ -13,8 +13,7 @@ class Gyve::V1::ImagesController < ApplicationController
   end
 
   def create
-    obj = ImageObject.find_or_create_by(id: params[:object_id], name: params[:object_id],
-                                        created_by: params[:user_id])
+    obj = ImageObject.create_if_none(params)
 
     if params[:image_data]
       image = Image.upload_image(obj, params[:image_data], params[:user_id], @now)

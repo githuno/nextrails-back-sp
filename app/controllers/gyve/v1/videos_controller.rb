@@ -2,7 +2,7 @@ class Gyve::V1::VideosController < ApplicationController
   before_action :set_nowtime, only: %i[create pre_create]
 
   def pre_create
-    obj = ImageObject.find_or_create_by(id: params[:object_id], name: params[:object_id], created_by: params[:user_id])
+    obj = ImageObject.create_if_none(params)
     usr_id = params[:user_id]
     s3_key = "#{obj.id}/#{@now}.mp4"
     image_path = "#{ENV['S3_PUBLIC_URL']}/#{s3_key}"

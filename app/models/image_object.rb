@@ -9,6 +9,38 @@ class ImageObject < ApplicationRecord
   has_one_attached :ply_file, dependent: :destroy
   has_one_attached :splat_file, dependent: :destroy
 
+  def self.create_if_none(params)
+    ImageObject.find_by(id: params[:object_id]) ||
+      ImageObject.create!(id: params[:object_id], name: params[:object_id], created_by: params[:user_id])
+  end
+
+  def self.upload_image(obj, image_data, user_id, now)
+    image_bytes = Base64.decode64(image_data)
+    io = StringIO.new(image_bytes)
+    filename = "#{now}.png"
+    key = "#{obj.id}/#{filename}"
+    image_path = "#{ENV['S3_PUBLIC_URL']}/#{key}"
+    image = Image.create!(object_id: obj.id, image_path:, updated_by: user_id)
+    image.file.attach(io:, key:, filename:, content_type: 'image/png')
+    image
+  rescue StandardError => e
+    raise "Failed to upload image: #{e.message}"
+  end
+
+  def delete_related_s3files
+    obj_id = id
+    base_name = image_path.split('/').last.sub(/\.[^.]+\z/, '')
+    return if File.extname(image_path) == '.png'
+
+    extensions = ['.png', '.html', '.mp4'] # 削除対象の拡張子
+    extensions.each do |extension|
+      key = "#{obj_id}/#{base_name}#{extension}"
+      S3ResourceService.instance.resource.bucket(ENV['S3_BUCKET']).object(key).delete
+    end
+  rescue Aws::S3::Errors::ServiceError => e
+    raise "Failed to delete related S3 files: #{e.message}"
+  end
+
   def main_image
     images.first&.image_path || ''
   end

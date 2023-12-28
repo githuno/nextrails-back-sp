@@ -23,6 +23,6 @@ class Gyve::V1::SplatsController < ApplicationController
   private
 
   def set_object
-    @object = ImageObject.find_or_create_by(id: params[:object_id], name: params[:object_id], created_by: params[:user_id])
+    @object = ImageObject.create_if_none(params)
   end
 end
