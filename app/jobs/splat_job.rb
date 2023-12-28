@@ -10,7 +10,7 @@ class SplatJob < ApplicationJob
   def self.monitor_async(image_object)
     initial_condition3d = image_object.condition3d
 
-    15.times do
+    15.times do |i|
       puts "minitoriing condition3d: times = #{i}"
       sleep 60 # 1分待つ
       image_object.reload # 最新の状態を読み込む
