@@ -112,7 +112,7 @@ class ImageObject < ApplicationRecord
 
   def req_new
     uri = URI.parse('https://isk221492--gs-gaussian.modal.run/create/ply')
-    http = Net::HTTP.new(url.host, url.port) # HTTP通信を行う
+    http = Net::HTTP.new(uri.host, uri.port) # HTTP通信を行う
     http.use_ssl = true # SSL通信を行う
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE # 証明書の検証を行わない
     http.read_timeout = 60 # 60秒後にタイムアウト
