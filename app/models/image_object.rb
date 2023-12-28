@@ -107,7 +107,7 @@ class ImageObject < ApplicationRecord
   end
 
   def req_new
-    uri = URI.parse('http://xxxxx/create/ply')
+    uri = URI.parse('https://isk221492--gs-gaussian.modal.run/create/ply')
     http = Net::HTTP.new(uri.host, uri.port)
     http.read_timeout = 60 # 60秒後にタイムアウト
     request = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
