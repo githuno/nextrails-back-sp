@@ -83,6 +83,7 @@ class ImageObject < ApplicationRecord
     # Download the ply file from S3 as a stream
     begin
       downloaded_ply_stream = download_from_s3(ply_key)
+      puts '>> Downloaded ply file from S3'
     rescue Aws::S3::Errors::ServiceError => e
       puts "Failed to download from S3: #{e.message}"
       raise "Failed to download from S3: #{e.message}"
@@ -91,6 +92,7 @@ class ImageObject < ApplicationRecord
     # Convert ply stream to splat stream and attach it
     splat_stream = convert_ply_to_splat(downloaded_ply_stream)
     raise 'Failed to convert ply to splat' unless splat_stream
+    puts '>> Converted ply to splat'
 
     # Attach the splat stream to Active Storage
     splat_key = "#{id}/output/a.splat"
@@ -103,6 +105,7 @@ class ImageObject < ApplicationRecord
   def create_3d
     SplatJob.perform_later(:monitor_async, self)
     req_new
+    puts '>> REQUEST "3d create" to gaussian is done'
   rescue StandardError => e
     Rails.logger.error "Failed to create 3d: #{e.message}"
     raise "Failed to create 3d: #{e.message}"
