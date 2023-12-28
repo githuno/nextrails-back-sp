@@ -114,7 +114,7 @@ class ImageObject < ApplicationRecord
     http = Net::HTTP.new(uri.host, uri.port)
     http.read_timeout = 60 # 60秒後にタイムアウト
     request = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
-    request.body = { id:, id:, iterations: 3000 }.to_json
+    request.body = { created_by: created_by, id: id, iterations: 3000 }.to_json
 
     begin
       response = http.request(request)
