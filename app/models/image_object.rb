@@ -70,6 +70,9 @@ class ImageObject < ApplicationRecord
   def create_3d
     SplatJob.perform_later(:monitor_async, self)
     req_new
+  rescue StandardError => e
+    Rails.logger.error "Error: #{e}"
+    render json: { 'msg' => e.message }, status: :internal_server_error
   end
 
   private
