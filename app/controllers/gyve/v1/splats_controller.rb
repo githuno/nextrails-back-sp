@@ -1,20 +1,28 @@
 class Gyve::V1::SplatsController < ApplicationController
-  def check
-    # データベースから condition3d カラムの値を取得
-    object = ImageObject.find_by(id: params[:object_id])
-    # なければエラーを返す
-    if object.nil?
-        render json: { 'msg' => 'Error: Object not found in DB.' }, status: :not_found
-        return
-    end
+  before_action :set_object, only: %i[create pre_create]
 
-    result = object.condition3d_info
+  def check_works
+    # workspaceのフォルダを確認
+  end
 
-    render json: { 'msg' => '',
-                   'result' => { 'cdt3d_status' => result[:status], 'cdt3d_msg' => result[:message] } }
+  def destroy_works
+    # workspaceのフォルダを削除
+  end
+
+  def create
+    msg = @object.create_3d
+    render json: { 'msg' => msg }
   rescue StandardError => e
-    # エラーが発生した場合の処理（ログの記録等）を行う
-    Rails.logger.error "Error getting condition3d from database: #{e}"
-    render json: { 'msg' => 'データベースエラー' }, status: :internal_server_error
+    render json: { 'error' => e.message }, status: :internal_server_error
+  end
+
+  def update; end
+
+  def destroy; end
+
+  private
+
+  def set_object
+    @object = ImageObject.find_or_create_by(id: params[:object_id], name: params[:object_id], user_id: params[:user_id])
   end
 end
