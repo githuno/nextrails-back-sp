@@ -82,17 +82,19 @@ class ImageObject < ApplicationRecord
     ply_key = "#{id}/output/cloud_ponit.ply"
     # Download the ply file from S3 as a stream
     begin
+      puts '>> ATTACH : download process start...' 
       downloaded_ply_stream = download_from_s3(ply_key)
-      puts '>> Downloaded ply file from S3'
+      puts '>> ATTACH : download process finished !!'
     rescue Aws::S3::Errors::ServiceError => e
       puts "Failed to download from S3: #{e.message}"
-      raise "Failed to download from S3: #{e.message}"
+      raise "❌❌ Failed to download from S3: #{e.message}"
     end
 
     # Convert ply stream to splat stream and attach it
+    puts '>> ATTACH : convert process start...'
     splat_stream = convert_ply_to_splat(downloaded_ply_stream)
-    raise 'Failed to convert ply to splat' unless splat_stream
-    puts '>> Converted ply to splat'
+    raise '❌❌ Failed to convert ply to splat' unless splat_stream
+    puts '>> ATTACH : convert process finished !!'
 
     # Attach the splat stream to Active Storage
     splat_key = "#{id}/output/a.splat"
@@ -100,11 +102,13 @@ class ImageObject < ApplicationRecord
 
     # Attach the downloaded ply file to Active Storage
     ply_file.attach(io: downloaded_ply_stream, filename: ply_key)
+    puts '>> ATTACH : attach process finished !!'
   end
 
   def create_3d
-    SplatJob.perform_later(:monitor_async, self)
-    req_new
+    attach_splat # debug
+    # SplatJob.perform_later(:monitor_async, self)
+    # req_new
   rescue StandardError => e
     Rails.logger.error "Failed to create 3d: #{e.message}"
     raise "Failed to create 3d: #{e.message}"
@@ -125,7 +129,7 @@ class ImageObject < ApplicationRecord
 
     if error_output.read.present?
       puts "Failed to convert ply to splat: #{error_output.read}"
-      raise "Failed to convert ply to splat: #{error_output.read}"
+      raise "❌❌ Failed to convert ply to splat: #{error_output.read}"
     end
 
     # Return the splat stream
@@ -138,9 +142,10 @@ class ImageObject < ApplicationRecord
 
     # Download the file from S3 as a stream
     begin
+      puts '>> Downloading ply file from S3.......'
       s3.bucket(bucket_name).object(s3_key).get.body
     rescue Aws::S3::Errors::ServiceError => e
-      raise "Failed to download from S3: #{e.message}"
+      raise "❌❌ Failed to download from S3: #{e.message}"
     end
   end
 
@@ -156,8 +161,9 @@ class ImageObject < ApplicationRecord
     begin
       puts '>> GAUSSIAN REQUEST is started'
       response = http.request(request)
-      puts '<< GAUSSIAN REQUEST is finished'
+      puts "<< GAUSSIAN REQUEST is finished: response is <<#{response.body}>>"
     rescue Net::ReadTimeout => e
+      puts "Rails > GAUSSIAN Request timed out: #{e.message}"
       raise "Rails > GAUSSIAN Request timed out: #{e.message}"
     end
     response.read_body

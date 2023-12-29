@@ -25,6 +25,7 @@ class SplatJob < ApplicationJob
   end
 
   def perform(method, *args)
+    puts "SplatJob.perform: method = #{method}"
     self.class.send(method, *args)
   end
 end
