@@ -1,12 +1,26 @@
 import execjs
 
+# JavaScriptコード
+JS_COMMAND = """
+function check() {
+    try {
+        require('fs');
+        console.log('module OK !');
+    } catch (error) {
+        console.error('Error loading fs module:', error);
+        process.exit(1);
+    }
+}
+
+// check関数を呼び出す
+check();
+"""
+
 # JavaScriptエンジンを初期化
-check = execjs.compile(open('/opt/check-module.js').read())
+ctx = execjs.compile(JS_COMMAND)
 
 # JavaScript関数を呼び出す
-result = check.call()
-
-
+result = ctx.call("check")
 # import subprocess
 
 # # JavaScriptファイルの内容を読み込む
