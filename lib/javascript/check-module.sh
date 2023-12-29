@@ -1,6 +1,5 @@
 // bin/sh
-node -e 
-
+node -e \
 " \
 try {  \
         require('fs'); \
