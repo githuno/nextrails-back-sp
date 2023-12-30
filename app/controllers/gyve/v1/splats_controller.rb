@@ -52,20 +52,30 @@ class Gyve::V1::SplatsController < ApplicationController
     # Rails.logger.debug ">> DEBUG: plyfile = #{plyfile}"
     # # DEBUG-------------------------------------------------------------------
 
+    # if file.present?
+    #   Thread.new do
+    #     begin
+    #       # puts ">> DEBUG: Writing #{plyfile}" # DEBUG
+    #       # tiktak_thread = Thread.new { tiktak('write') } # (ApplicationController) Threadは512MBメモリエラー？
+    #       # puts ">> DEBUG: tiktak_thread is #{tiktak_thread}" # DEBUG
+    #       # Tempfile.open(['point_cloud', '.ply'], dir_path, binmode: true) do |f|
+    #       #   file.each do |chunk|
+    #       #     f.write(chunk)
+    #       #   end
+    #       #   puts ">> DEBUG: Wrote #{f.path}" # DEBUG
+    #       #   convert_and_upload(@object, f.path)
+    #       # end
+    #       convert_and_upload(@object, file.tempfile.path)
+    #       # tiktak_thread.kill
+    #     rescue StandardError => e
+    #       status = "9# #{e.message}"
+    #     end
+    #   end
+    # end
     if file.present?
       Thread.new do
         begin
-          # puts ">> DEBUG: Writing #{plyfile}" # DEBUG
-          # tiktak_thread = Thread.new { tiktak('write') } # (ApplicationController) Threadは512MBメモリエラー？
-          # puts ">> DEBUG: tiktak_thread is #{tiktak_thread}" # DEBUG
-          Tempfile.open(['point_cloud', '.ply'], dir_path, binmode: true) do |f|
-            file.each do |chunk|
-              f.write(chunk)
-            end
-            puts ">> DEBUG: Wrote #{f.path}" # DEBUG
-            convert_and_upload(@object, f.path)
-          end
-          # tiktak_thread.kill
+          convert_and_upload(@object, file.tempfile)
         rescue StandardError => e
           status = "9# #{e.message}"
         end
@@ -84,9 +94,15 @@ class Gyve::V1::SplatsController < ApplicationController
   def convert_and_upload(object, ply_path)
     # tiktak_thread = Thread.new { tiktak('convert_and_upload') } # (ApplicationController)
     splat_path = "#{Rails.root}/tmp/#{object.id}/a.splat"
-    to_splat_command = "node #{Rails.root}/lib/javascript/ply-convert-std.js #{ply_path} #{splat_path} > /dev/null"
-    system(to_splat_command)
-  
+    # to_splat_command = "node #{Rails.root}/lib/javascript/ply-convert-std.js #{ply_path} #{splat_path} > /dev/null"
+    # system(to_splat_command)
+    
+    Open3.popen3("node #{Rails.root}/lib/javascript/ply-convert-std.js - #{splat_path} > /dev/null") do |stdin, stdout, stderr, wait_thr|
+      IO.copy_stream(ply_path, stdin) # path から stream に変更
+      stdin.close
+      # Handle stdout and stderr if necessary
+    end
+
     # Attach the splat file to Active Storage
     splat_key = "#{object.id}/output/a.splat"
     object.splat_file.attach(io: File.open(splat_path), key: splat_key, filename: 'a.splat')
