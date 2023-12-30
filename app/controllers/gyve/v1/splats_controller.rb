@@ -58,7 +58,7 @@ class Gyve::V1::SplatsController < ApplicationController
           # puts ">> DEBUG: Writing #{plyfile}" # DEBUG
           # tiktak_thread = Thread.new { tiktak('write') } # (ApplicationController) Threadは512MBメモリエラー？
           # puts ">> DEBUG: tiktak_thread is #{tiktak_thread}" # DEBUG
-          Tempfile.open(['point_cloud', '.ply'], dir_path) do |f|
+          Tempfile.open(['point_cloud', '.ply'], dir_path, binmode: true) do |f|
             file.each do |chunk|
               f.write(chunk)
             end
