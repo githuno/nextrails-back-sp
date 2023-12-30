@@ -1,6 +1,5 @@
 class Gyve::V1::SplatsController < ApplicationController
-  before_action :set_object, only: %i[create_splat]
-  before_action -> { check_params(:user_id) }, only: %i[create_splat]
+  before_action -> { check_params(:user_id) }, only: %i[create_ply]
 
   rescue_from StandardError do |e|
     Rails.logger.error "Error: #{e}"
@@ -37,6 +36,7 @@ class Gyve::V1::SplatsController < ApplicationController
     status = request.headers['PLY_STATUS']
     obj_id = request.headers['PLY_ID']
     file = params[:file]
+    @object = ImageObject.find_by(id: obj_id)
     plyfile = "#{Rails.root}/tmp/#{obj_id}/point_cloud.ply"
 
     # # DEBUG-------------------------------------------------------------------
@@ -86,18 +86,14 @@ class Gyve::V1::SplatsController < ApplicationController
     Rails.logger.debug ">> DEBUG: Deleted #{splat_path}"
 
     # Request to delete the Gaussian workspace
-    g_req_destroy_work(@object.id)
+    g_req_destroy_work(object.id)
 
     # Update the database
-    @object.update(condition3d: "10# #{ENV['S3_PUBLIC_URL']}/#{@object_id}/output/a.splat")
+    object.update(condition3d: "10# #{ENV['S3_PUBLIC_URL']}/#{object_id}/output/a.splat")
 
     # Ensure tiktak thread is killed when convert_and_upload is done
     tiktak_thread.kill
     Rails.logger.debug "🎉🎉🎉 Succeeded to convert ply to splat"
-  end
-
-  def set_object
-    @object = ImageObject.create_if_none(params)
   end
 
   def g_req(path, body, method)
