@@ -51,22 +51,25 @@ class Gyve::V1::SplatsController < ApplicationController
     # plyfile = "#{dir_path}/63fd89ec-3052-4079-a6cb-e626a121218f/output/point_cloud.ply"
     # Rails.logger.debug ">> DEBUG: plyfile = #{plyfile}"
     # # DEBUG-------------------------------------------------------------------
-    
+
     if file.present?
-      begin
-        # puts ">> DEBUG: Writing #{plyfile}" # DEBUG
-        # tiktak_thread = Thread.new { tiktak('write') } # (ApplicationController) Threadは512MBメモリエラー？
-        # puts ">> DEBUG: tiktak_thread is #{tiktak_thread}" # DEBUG
-        File.open(plyfile, 'wb') do |f|
-          f.write(file.read)
-          puts ">> DEBUG: Wrote #{plyfile}" # DEBUG
-        end
-        # tiktak_thread.kill
-        Thread.new do
+      Thread.new do
+        begin
+          # puts ">> DEBUG: Writing #{plyfile}" # DEBUG
+          # tiktak_thread = Thread.new { tiktak('write') } # (ApplicationController) Threadは512MBメモリエラー？
+          # puts ">> DEBUG: tiktak_thread is #{tiktak_thread}" # DEBUG
+          Tempfile.open(['point_cloud', '.ply'], dir_path) do |f|
+            file.each do |chunk|
+              f.write(chunk)
+            end
+            puts ">> DEBUG: Wrote #{f.path}" # DEBUG
+            convert_and_upload(@object, f.path)
+          end
+          # tiktak_thread.kill
           convert_and_upload(@object, plyfile)
+        rescue StandardError => e
+          status = "9# #{e.message}"
         end
-      rescue StandardError => e
-        status = "9# #{e.message}"
       end
     end
 
