@@ -1,4 +1,8 @@
+require "sidekiq/web"
+
 Rails.application.routes.draw do
+  # redis
+  mount Sidekiq::Web => "/sidekiq"
   get '/', to: 'hello#create'
   namespace :api do
     namespace :v1 do
@@ -19,8 +23,6 @@ Rails.application.routes.draw do
       post '/create_3d', to: 'objects#create_3d'
       # gaussian
       post '/return_ply', to: 'splats#create_splat'
-
-
     end
   end
   

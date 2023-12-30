@@ -28,6 +28,11 @@ class Gyve::V1::SplatsController < ApplicationController
   end
 
   def create_splat
+    # puts '>> GyveJob.perform_later is started'
+    # GyveJob.perform_later('tiktak', 'create_splat') # Threadsが非推奨のため、後で検証する
+    # puts '>> GyveJob is working... log/development.logを確認してください'
+    # Procfileでworkerを同時起動（bundle exec sidekiq -q default）する必要がある。
+    # また、upstashへのコマンドリクエストが大量発生しており、検証が必要。
     Rails.logger.debug '>> GAUSSIAN RESPONSE HOOK is started'
     plyfile = request.headers['HTTP_FILENAME']
     status = params[:status]
