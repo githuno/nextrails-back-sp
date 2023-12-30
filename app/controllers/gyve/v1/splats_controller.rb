@@ -34,16 +34,21 @@ class Gyve::V1::SplatsController < ApplicationController
     # Procfileでworkerを同時起動（bundle exec sidekiq -q default）する必要がある。
     # また、upstashへのコマンドリクエストが大量発生しており、検証が必要。
     Rails.logger.debug '>> GAUSSIAN RESPONSE HOOK is started'
-    plyfile = request.headers['HTTP_FILENAME']
-    status = params[:status]
+    status = request.headers['PLY_STATUS']
+    obj_id = request.headers['PLY_ID']
+    file = params[:file]
+    plyfile = "#{Rails.root}/tmp/#{obj_id}/point_cloud.ply"
+
     # # DEBUG-------------------------------------------------------------------
     # Rails.logger.debug '>> DEBUG: Using local file instead of request body'
     # plyfile = "#{Rails.root}/tmp/63fd89ec-3052-4079-a6cb-e626a121218f/output/point_cloud.ply"
     # Rails.logger.debug ">> DEBUG: plyfile = #{plyfile}"
     # # DEBUG-------------------------------------------------------------------
     
-    if File.exist?(plyfile)
+    if file.present?
       begin
+        File.open(plyfile, 'wb') do |f|
+          f.write(file.read)
         Thread.new do
           convert_and_upload(@object, plyfile)
         end
@@ -61,7 +66,7 @@ class Gyve::V1::SplatsController < ApplicationController
 
   def convert_and_upload(object, ply_path)
     tiktak_thread = Thread.new { tiktak('convert_and_upload') } # (ApplicationController)
-    splat_path = "#{Rails.root}/tmp/#{object.id}/output/a.splat"
+    splat_path = "#{Rails.root}/tmp/#{object.id}/a.splat"
     to_splat_command = "node #{Rails.root}/lib/javascript/ply-convert-std.js #{ply_path} #{splat_path} > /dev/null"
     system(to_splat_command)
   
