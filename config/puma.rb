@@ -37,7 +37,25 @@ pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 # before forking the application. This takes advantage of Copy On Write
 # process behavior so workers use less memory.
 #
-# preload_app!
+
+# -----------------------------------------render用に追記
+preload_app! # 元々コメントアウトされていた
+
+
+before_fork do
+    ActiveRecord::Base.connection_pool.disconnect!
+end
+
+on_worker_boot do
+    ActiveRecord::Base.establish_connection
+end
+
+# ワーカープロセスごとのメモリ上限 (MB) の設定
+worker_memory_limit_mb = Integer(ENV['WORKER_MEMORY_LIMIT_MB'] || 512)
+before_exec do |server|
+    server.config[:worker_memory_limit] = worker_memory_limit_mb
+end
+# -----------------------------------------render用に追記
 
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
