@@ -6,7 +6,6 @@ require 'openssl'
 
 class ImageObject < ApplicationRecord
   has_many :images, foreign_key: :object_id, dependent: :destroy
-  has_one_attached :ply_file, dependent: :destroy
   has_one_attached :splat_file, dependent: :destroy
 
   def self.create_if_none(params)

@@ -22,12 +22,15 @@ class Gyve::V1::SplatsController < ApplicationController
     # splatの削除を行う
   end
 
-  def create_ply(object_id, iterations)
-    g_req_create_ply(object_id, iterations)
+  def create_ply(object_id, iterations) # 別のコントローラーから呼び出す
+    Thread.new do
+      g_req_create_ply(object_id, iterations)
+    end
+    render json: { 'msg' => '0# 作成リクエストを受け付けました。' }
   end
 
   def create_splat
-    puts '>> GAUSSIAN RESPONSE HOOK is started'
+    puts '🔨🔨 GAUSSIAN RESPONSE HOOK is started'
     Rails.logger.debug '>> GAUSSIAN RESPONSE HOOK is started'
     # GyveJob.perform_later('tiktak', 'create_splat') # Threadsが非推奨のため、後で検証する
     # puts '>> GyveJob is working... log/development.logを確認してください'
@@ -35,70 +38,38 @@ class Gyve::V1::SplatsController < ApplicationController
     # また、upstashへのコマンドリクエストが大量発生しており、検証が必要。
     
     status = request.headers['HTTP_PLY_STATUS']
-    puts "status is #{status}" # DEBUG
     obj_id = request.headers['HTTP_PLY_ID']
-    # obj_id = request.headers['HTTP_PLY_ID'].tr('"', '')
-    puts "obj_id is #{obj_id}" # DEBUG
     file = params[:file]
     @object = ImageObject.find_by(id: obj_id)
-    puts "2: object is #{@object}" # DEBUG
-    dir_path = "#{Rails.root}/tmp/#{obj_id}"
-    FileUtils.mkdir_p(dir_path) unless Dir.exist?(dir_path)
-    # plyfile = "#{dir_path}/point_cloud.ply"
+    @dir_path = "#{Rails.root}/tmp/#{obj_id}"
+    FileUtils.mkdir_p(@dir_path) unless Dir.exist?(@dir_path)
 
-    # # DEBUG-------------------------------------------------------------------
-    # Rails.logger.debug '>> DEBUG: Using local file instead of request body'
-    # plyfile = "#{dir_path}/63fd89ec-3052-4079-a6cb-e626a121218f/output/point_cloud.ply"
-    # Rails.logger.debug ">> DEBUG: plyfile = #{plyfile}"
-    # # DEBUG-------------------------------------------------------------------
-
-    # if file.present?
-    #   Thread.new do
-    #     begin
-    #       # puts ">> DEBUG: Writing #{plyfile}" # DEBUG
-    #       # tiktak_thread = Thread.new { tiktak('write') } # (ApplicationController) Threadは512MBメモリエラー？
-    #       # puts ">> DEBUG: tiktak_thread is #{tiktak_thread}" # DEBUG
-    #       # Tempfile.open(['point_cloud', '.ply'], dir_path, binmode: true) do |f|
-    #       #   file.each do |chunk|
-    #       #     f.write(chunk)
-    #       #   end
-    #       #   puts ">> DEBUG: Wrote #{f.path}" # DEBUG
-    #       #   convert_and_upload(@object, f.path)
-    #       # end
-    #       convert_and_upload(@object, file.tempfile.path)
-    #       # tiktak_thread.kill
-    #     rescue StandardError => e
-    #       status = "9# #{e.message}"
-    #     end
-    #   end
-    # end
     if file.present?
-      Thread.new do
+      tiktak_thread = Thread.new { tiktak('convert') } # (ApplicationController)
+      thread_result = Thread.new do
         begin
           convert_and_upload(@object, file.tempfile)
+          "0# Conversion and upload successful"
         rescue StandardError => e
-          status = "9# #{e.message}"
+          "9# #{e.message}"
         end
       end
+      tiktak_thread.kill
+      status = thread_result.value
     end
 
-    # Update the database at the end
-    puts ">> DEBUG: Updating condition3d to #{status}" # DEBUG
-    Rails.logger.debug ">> DEBUG: Updating condition3d to #{status}" # DEBUG
+    # Update the database temporarily
     @object.update!(condition3d: status)
-    render json: { 'msg' => 'splat is creating...' }, status: :ok # 200
+    # Render temporarily
+    render json: { 'msg' => 'THREAD convert is creating...' }, status: :ok # 200
   end
 
   private
 
-  def convert_and_upload(object, ply_path)
-    # tiktak_thread = Thread.new { tiktak('convert_and_upload') } # (ApplicationController)
-    splat_path = "#{Rails.root}/tmp/#{object.id}/a.splat"
-    # to_splat_command = "node #{Rails.root}/lib/javascript/ply-convert-std.js #{ply_path} #{splat_path} > /dev/null"
-    # system(to_splat_command)
-    
+  def convert_and_upload(object, ply_stream)
+    splat_path = "#{Rails.root}/tmp/#{object.id}/a.splat"    
     Open3.popen3("node #{Rails.root}/lib/javascript/ply-convert-std.js - #{splat_path} > /dev/null") do |stdin, stdout, stderr, wait_thr|
-      IO.copy_stream(ply_path, stdin) # path から stream に変更
+      IO.copy_stream(ply_stream, stdin)
       stdin.close
       # Handle stdout and stderr if necessary
     end
@@ -106,22 +77,22 @@ class Gyve::V1::SplatsController < ApplicationController
     # Attach the splat file to Active Storage
     splat_key = "#{object.id}/output/a.splat"
     object.splat_file.attach(io: File.open(splat_path), key: splat_key, filename: 'a.splat')
+    puts ">> DEBUG: Attached splat file to Active Storage" # DEBUG
 
-    # # Attach the ply file to Active Storage
-    # ply_key = "#{object.id}/output/point_cloud.ply"
-    # @object.plyfile.attach(io: File.open(ply_path), key: ply_key ,filename: 'point_cloud.ply')
-
-    # # Delete the directory
+    # Delete the directory
     FileUtils.rm_rf("#{Rails.root}/tmp/#{object.id}")
+    puts ">> DEBUG: Deleted #{Rails.root}/tmp/#{object.id}" # DEBUG
 
     # Request to delete the Gaussian workspace
     g_req_destroy_work(object.id)
+    puts ">> DEBUG: Requested to delete the Gaussian workspace" # DEBUG
 
     # Update the database
-    object.update(condition3d: "10# #{ENV['S3_PUBLIC_URL']}/#{object_id}/output/a.splat")
+    object.update(condition3d: "10# #{ENV['S3_PUBLIC_URL']}/#{object.id}/output/a.splat")
+    puts ">> DEBUG: Updated condition3d to #{ENV['S3_PUBLIC_URL']}/#{object.id}/output/a.splat" # DEBUG
 
-    # Ensure tiktak thread is killed when convert_and_upload is done
-    # tiktak_thread.kill
+    # Ensure the splat file is attached
+    puts "🎉🎉🎉 Succeeded to convert ply to splat"
     Rails.logger.debug "🎉🎉🎉 Succeeded to convert ply to splat"
   end
 
@@ -151,7 +122,7 @@ class Gyve::V1::SplatsController < ApplicationController
   end
 
   def g_req_create_ply(object_id, iterations)
-    g_req('create/ply', { id: object_id, iterations: }, :post)
+    g_req('create/ply', { id: object_id, iterations: iterations }, :post)
   end
 
   def g_req_show_works
