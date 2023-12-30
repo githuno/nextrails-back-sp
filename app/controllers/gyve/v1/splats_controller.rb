@@ -36,7 +36,7 @@ class Gyve::V1::SplatsController < ApplicationController
     # puts '>> GyveJob is working... log/development.logを確認してください'
     # Procfileでworkerを同時起動（bundle exec sidekiq -q default）する必要がある。
     # また、upstashへのコマンドリクエストが大量発生しており、検証が必要。
-    
+
     status = request.headers['HTTP_PLY_STATUS']
     obj_id = request.headers['HTTP_PLY_ID']
     file = params[:file]
@@ -47,12 +47,10 @@ class Gyve::V1::SplatsController < ApplicationController
     if file.present?
       tiktak_thread = Thread.new { tiktak('convert') } # (ApplicationController)
       thread_result = Thread.new do
-        begin
-          convert_and_upload(@object, file.tempfile)
-          "0# Conversion and upload successful"
-        rescue StandardError => e
-          "9# #{e.message}"
-        end
+        convert_and_upload(@object, file.tempfile)
+        '0# Conversion and upload successful'
+      rescue StandardError => e
+        "9# #{e.message}"
       end
       tiktak_thread.kill
       status = thread_result.value
@@ -67,8 +65,8 @@ class Gyve::V1::SplatsController < ApplicationController
   private
 
   def convert_and_upload(object, ply_stream)
-    splat_path = "#{Rails.root}/tmp/#{object.id}/a.splat"    
-    Open3.popen3("node #{Rails.root}/lib/javascript/ply-convert-std.js - #{splat_path} > /dev/null") do |stdin, stdout, stderr, wait_thr|
+    splat_path = "#{Rails.root}/tmp/#{object.id}/a.splat"
+    Open3.popen3("node #{Rails.root}/lib/javascript/ply-convert-std.js - #{splat_path} > /dev/null") do |stdin, _stdout, _stderr, _wait_thr|
       IO.copy_stream(ply_stream, stdin)
       stdin.close
       # Handle stdout and stderr if necessary
@@ -77,7 +75,7 @@ class Gyve::V1::SplatsController < ApplicationController
     # Attach the splat file to Active Storage
     splat_key = "#{object.id}/output/a.splat"
     object.splat_file.attach(io: File.open(splat_path), key: splat_key, filename: 'a.splat')
-    puts ">> DEBUG: Attached splat file to Active Storage" # DEBUG
+    puts '>> DEBUG: Attached splat file to Active Storage' # DEBUG
 
     # Delete the directory
     FileUtils.rm_rf("#{Rails.root}/tmp/#{object.id}")
@@ -85,15 +83,15 @@ class Gyve::V1::SplatsController < ApplicationController
 
     # Request to delete the Gaussian workspace
     g_req_destroy_work(object.id)
-    puts ">> DEBUG: Requested to delete the Gaussian workspace" # DEBUG
+    puts '>> DEBUG: Requested to delete the Gaussian workspace' # DEBUG
 
     # Update the database
     object.update(condition3d: "10# #{ENV['S3_PUBLIC_URL']}/#{object.id}/output/a.splat")
     puts ">> DEBUG: Updated condition3d to #{ENV['S3_PUBLIC_URL']}/#{object.id}/output/a.splat" # DEBUG
 
     # Ensure the splat file is attached
-    puts "🎉🎉🎉 Succeeded to convert ply to splat"
-    Rails.logger.debug "🎉🎉🎉 Succeeded to convert ply to splat"
+    puts '🎉🎉🎉 Succeeded to convert ply to splat'
+    Rails.logger.debug '🎉🎉🎉 Succeeded to convert ply to splat'
   end
 
   def g_req(path, body, method)
@@ -122,7 +120,7 @@ class Gyve::V1::SplatsController < ApplicationController
   end
 
   def g_req_create_ply(object_id, iterations)
-    g_req('create/ply', { id: object_id, iterations: iterations }, :post)
+    g_req('create/ply', { id: object_id, iterations: }, :post)
   end
 
   def g_req_show_works
