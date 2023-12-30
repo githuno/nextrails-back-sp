@@ -54,14 +54,14 @@ class Gyve::V1::SplatsController < ApplicationController
     
     if file.present?
       begin
-        puts ">> DEBUG: Writing #{plyfile}"
-        tiktak_thread = Thread.new { tiktak('write') } # (ApplicationController)
-        puts ">> DEBUG: tiktak_thread is #{tiktak_thread}"
+        # puts ">> DEBUG: Writing #{plyfile}" # DEBUG
+        # tiktak_thread = Thread.new { tiktak('write') } # (ApplicationController) Threadは512MBメモリエラー？
+        # puts ">> DEBUG: tiktak_thread is #{tiktak_thread}" # DEBUG
         File.open(plyfile, 'wb') do |f|
           f.write(file.read)
-          puts ">> DEBUG: Wrote #{plyfile}"
+          puts ">> DEBUG: Wrote #{plyfile}" # DEBUG
         end
-        tiktak_thread.kill
+        # tiktak_thread.kill
         Thread.new do
           convert_and_upload(@object, plyfile)
         end
@@ -80,7 +80,7 @@ class Gyve::V1::SplatsController < ApplicationController
   private
 
   def convert_and_upload(object, ply_path)
-    tiktak_thread = Thread.new { tiktak('convert_and_upload') } # (ApplicationController)
+    # tiktak_thread = Thread.new { tiktak('convert_and_upload') } # (ApplicationController)
     splat_path = "#{Rails.root}/tmp/#{object.id}/a.splat"
     to_splat_command = "node #{Rails.root}/lib/javascript/ply-convert-std.js #{ply_path} #{splat_path} > /dev/null"
     system(to_splat_command)
@@ -103,7 +103,7 @@ class Gyve::V1::SplatsController < ApplicationController
     object.update(condition3d: "10# #{ENV['S3_PUBLIC_URL']}/#{object_id}/output/a.splat")
 
     # Ensure tiktak thread is killed when convert_and_upload is done
-    tiktak_thread.kill
+    # tiktak_thread.kill
     Rails.logger.debug "🎉🎉🎉 Succeeded to convert ply to splat"
   end
 
