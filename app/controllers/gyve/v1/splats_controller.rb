@@ -44,7 +44,7 @@ class Gyve::V1::SplatsController < ApplicationController
     puts "2: object is #{@object}" # DEBUG
     dir_path = "#{Rails.root}/tmp/#{obj_id}"
     FileUtils.mkdir_p(dir_path) unless Dir.exist?(dir_path)
-    plyfile = "#{dir_path}/point_cloud.ply"
+    # plyfile = "#{dir_path}/point_cloud.ply"
 
     # # DEBUG-------------------------------------------------------------------
     # Rails.logger.debug '>> DEBUG: Using local file instead of request body'
@@ -66,7 +66,6 @@ class Gyve::V1::SplatsController < ApplicationController
             convert_and_upload(@object, f.path)
           end
           # tiktak_thread.kill
-          convert_and_upload(@object, plyfile)
         rescue StandardError => e
           status = "9# #{e.message}"
         end
