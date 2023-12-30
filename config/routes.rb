@@ -18,7 +18,7 @@ Rails.application.routes.draw do
       post '/del_object', to: 'objects#destroy'
       post '/create_3d', to: 'objects#create_3d'
       # gaussian
-      post '/retrun_ply', to: 'splats#crete_splat'
+      post '/return_ply', to: 'splats#create_splat'
 
 
     end

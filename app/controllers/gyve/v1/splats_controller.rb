@@ -24,60 +24,65 @@ class Gyve::V1::SplatsController < ApplicationController
   end
 
   def create_ply(object_id, iterations)
-    # GAUSSIANにplyを作成するようにリクエスト
     g_req_create_ply(object_id, iterations)
   end
 
   def create_splat
-    puts '>> GAUSSIAN RESPONSE HOOK is started'
-    filename = request.headers['HTTP_FILENAME']
+    Rails.logger.debug '>> GAUSSIAN RESPONSE HOOK is started'
+    plyfile = request.headers['HTTP_FILENAME']
     status = params[:status]
-
-    if File.exist?(filename)
+    # # DEBUG-------------------------------------------------------------------
+    # Rails.logger.debug '>> DEBUG: Using local file instead of request body'
+    # plyfile = "#{Rails.root}/tmp/63fd89ec-3052-4079-a6cb-e626a121218f/output/point_cloud.ply"
+    # Rails.logger.debug ">> DEBUG: plyfile = #{plyfile}"
+    # # DEBUG-------------------------------------------------------------------
+    
+    if File.exist?(plyfile)
       begin
-        # Convert and upload the file to S3
-        GyveJob.perform_later('convert_and_upload_async', @object, request.body.read)
-        # Update the database
-        @object.update(condition3d: status)
-
-        # # Attach the ply file to Active Storage
-        # ply_key = "#{id}/output/point_cloud.ply"
-        # @object.plyfile.attach(io: File.open(filename), key: ply_key ,filename: filename)
-
-        # Delete the temporary file
-        File.delete(filename)
-        # Request to delete the Gaussian workspace
-        g_req_destroy_work(@object.id)
+        Thread.new do
+          convert_and_upload(@object, plyfile)
+        end
       rescue StandardError => e
-        # If an error occurs, store it in status
-        status = "8# #{e.message}"
+        status = "9# #{e.message}"
       end
     end
 
     # Update the database at the end
+    Rails.logger.debug ">> DEBUG: Updating condition3d to #{status}" # DEBUG
     @object.update(condition3d: status)
   end
 
   private
 
-  def convert_and_upload(object, ply_stream)
-    to_splat_command = 'node lib/javascript/ply-convert-std.js - -'
-    splatfile, error_output = Open3.popen3(to_splat_command) do |stdin, stdout, stderr, _wait_thr|
-      Thread.new do
-        IO.copy_stream(ply_stream, stdin)
-        stdin.close
-      end
-      [stdout, stderr]
-    end
+  def convert_and_upload(object, ply_path)
+    tiktak_thread = Thread.new { tiktak('convert_and_upload') } # (ApplicationController)
+    splat_path = "#{Rails.root}/tmp/#{object.id}/output/a.splat"
+    to_splat_command = "node #{Rails.root}/lib/javascript/ply-convert-std.js #{ply_path} #{splat_path} > /dev/null"
+    system(to_splat_command)
+  
+    # Attach the splat file to Active Storage
+    splat_key = "#{object.id}/output/a.splat"
+    object.splat_file.attach(io: File.open(splat_path), key: splat_key, filename: 'a.splat')
 
-    if error_output.read.present?
-      puts "Failed to convert ply to splat: #{error_output.read}"
-      raise "❌❌ Failed to convert ply to splat: #{error_output.read}"
-    end
+    # # Attach the ply file to Active Storage
+    # ply_key = "#{object.id}/output/point_cloud.ply"
+    # @object.plyfile.attach(io: File.open(ply_path), key: ply_key ,filename: 'point_cloud.ply')
 
-    # Upload the converted file to S3
-    s3_key = "#{object.id}/output/a.splat"
-    object.splatfile.attach(io: splatfile, key: s3_key, filename: 'a.splat')
+    # # Delete the temporary file
+    FileUtils.rm_f(ply_path)
+    Rails.logger.debug ">> DEBUG: Deleted #{ply_path}"
+    FileUtils.rm_f(splat_path)
+    Rails.logger.debug ">> DEBUG: Deleted #{splat_path}"
+
+    # Request to delete the Gaussian workspace
+    g_req_destroy_work(@object.id)
+
+    # Update the database
+    @object.update(condition3d: "10# #{ENV['S3_PUBLIC_URL']}/#{@object_id}/output/a.splat")
+
+    # Ensure tiktak thread is killed when convert_and_upload is done
+    tiktak_thread.kill
+    Rails.logger.debug "🎉🎉🎉 Succeeded to convert ply to splat"
   end
 
   def set_object
@@ -99,12 +104,12 @@ class Gyve::V1::SplatsController < ApplicationController
     request.body = body.to_json
 
     begin
-      puts '>> GAUSSIAN REQUEST is started'
+      Rails.logger.debug ">> GAUSSIAN REQUEST <#{method}> is started"
       response = http.request(request)
-      puts "<< GAUSSIAN RESPONSE is <<#{response.body}>>"
+      Rails.logger.debug "<< GAUSSIAN RESPONSE <#{method}> is <<#{response.body}>>"
     rescue Net::ReadTimeout => e
-      puts "❌ GAUSSIAN Request timed out: #{e.message}"
-      raise "❌ GAUSSIAN Request timed out: #{e.message}"
+      Rails.logger.debug "❌ GAUSSIAN REQUEST <#{method}> timed out: #{e.message}"
+      raise "❌ GAUSSIAN REQUEST <#{method}> timed out: #{e.message}"
     end
     response.read_body
   end
