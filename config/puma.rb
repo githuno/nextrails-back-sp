@@ -52,7 +52,7 @@ end
 
 # ワーカープロセスごとのメモリ上限 (MB) の設定
 worker_memory_limit_mb = Integer(ENV['WORKER_MEMORY_LIMIT_MB'] || 512)
-before_exec do |server|
+before_fork do |server|
     server.config[:worker_memory_limit] = worker_memory_limit_mb
 end
 # -----------------------------------------render用に追記
