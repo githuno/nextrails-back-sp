@@ -9,7 +9,6 @@ Rails.application.routes.draw do
 
   namespace :gyve do
     namespace :v1 do
-      # post '/get_images', to: 'get_images#image'
       post '/get_images', to: 'images#show'
       post '/post_image', to: 'images#create'
       post '/del_image', to: 'images#destroy'
@@ -17,7 +16,11 @@ Rails.application.routes.draw do
       post '/video_up', to: 'videos#create'
       post '/get_objects', to: 'objects#index'
       post '/del_object', to: 'objects#destroy'
-      post '/create_3d', to: 'splats#create'
+      post '/create_3d', to: 'objects#create_3d'
+      # gaussian
+      post '/retrun_ply', to: 'splats#crete_splat'
+
+
     end
   end
   

@@ -1,49 +1,51 @@
 class Gyve::V1::VideosController < ApplicationController
   before_action :set_nowtime, only: %i[create pre_create]
+  before_action :set_s3, only: %i[create pre_create]
+  before_action :set_object, only: %i[create pre_create]
+  before_action -> { check_params(:user_id, :object_id) }, only: %i[create pre_create]
+  before_action -> { check_params(:image_path) }, only: :create
+
+  rescue_from StandardError do |e|
+    render json: { 'detail' => e.message }, status: :internal_server_error # 500
+  end
 
   def pre_create
-    obj = ImageObject.create_if_none(params)
-    usr_id = params[:user_id]
-    s3_key = "#{obj.id}/#{@now}.mp4"
-    image_path = "#{ENV['S3_PUBLIC_URL']}/#{s3_key}"
-    image = Image.create!(object_id: obj.id, image_path:, updated_by: usr_id)
-    presigned_url = image.generate_presigned_url(s3_key)
-    render json: { 'msg' => 'success', 'result' => [{ 'id' => get_basename(image_path), 'path' => presigned_url }] }
-  rescue StandardError => e
-    render json: { 'detail' => "Failed to pre-create video: #{e.message}" }, status: :internal_server_error
+    s3_key = "#{@object.id}/#{@now}.mp4"
+    presigned_url = @s3.object(s3_key).presigned_url(:put)
+    render json: { 'msg' => 'success', 'result' => [{ 'id' => @now, 'path' => presigned_url }] }
   end
 
   def create
-    obj_id = params[:object_id]
-    base_name = params[:image_path] ? get_basename(params[:image_path]) : nil
-    if base_name.nil?
-      render json: { 'detail' => 'image_path parameter is missing' }, status: :bad_request
-      return
-    end
-    image_path = "#{ENV['S3_PUBLIC_URL']}/#{obj_id}/#{base_name}.mp4"
-    # sample_upload(obj_id, base_name)
-    render json: { 'msg' => 'Video uploaded successfully',
-                   'result' => [{ 'id' => base_name, 'path' => image_path }] }
-  rescue StandardError => e
-    render json: { 'detail' => "Failed to upload video: #{e.message}" }, status: :internal_server_error
+    raise 'Invalid file extension.' unless params[:image_path].end_with?('.mp4') # 拡張子がmp4でなければエラーを返す
+    base_name = get_basename(params[:image_path]) # (ApplicationController)
+    image_path = "#{ENV['S3_PUBLIC_URL']}/#{@object.id}/#{base_name}.mp4"
+    @image = Image.create!(object_id: @object.id, image_path: image_path, updated_by: params[:user_id])
+    render json: { 'msg' => 'Video uploaded successfully', 'result' => [{ 'id' => base_name, 'path' => image_path }] }
+  end
+
+  def thumbnail_create
+    # # videoを受け取る（HTTP）
+    # # ・・・
+    # # サムネイルを作成する
+    # thumbnail = create_thumbnail(video)
+    # # サムネイルをS3にアップロードする
+    # @image.file.attach(io: thumbnail, key: key, filename: filename, content_type: 'image/png')
+    # # DBに登録する
+    # Thumbnail.create!(object_id: @object.id, thumbnail_path: thumbnail.path, updated_by: params[:user_id])
+    # render json: { 'msg' => 'Thumbnail created successfully.' }
   end
 
   private
 
-  # def sample_upload(object_id, base_name) # filenameが日付のままupするとgaussianでもDLしてしまうため削除
-  #     # png file
-  #     png_key = "#{object_id}/#{base_name}.png"
-  #     png_template = File.read(Rails.root.join("public", "template.png"))
-
-  #     image = Image.find_by(image_path: "#{ENV['S3_PUBLIC_URL']}/#{object_id}/#{base_name}.mp4")
-  #     image.file.attach(io: StringIO.new(png_template), key: png_key, filename: "#{base_name}.png", content_type: 'image/png')
-  # end
-
   def set_nowtime
-    @now = Time.now
+    @now = get_nowtime # (ApplicationController)
   end
 
-  def log_error(e)
-    Rails.logger.error "#{e.class} (#{e.message}):\n  #{e.backtrace.join("\n  ")}"
+  def set_s3
+    @s3 = S3ResourceService.instance.resource
+  end
+
+  def set_object
+    @object = ImageObject.create_if_none(params)
   end
 end

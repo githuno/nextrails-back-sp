@@ -1,4 +1,12 @@
 class Gyve::V1::ObjectsController < ApplicationController
+  before_action :set_object, only: [:destroy, :create_3d]
+  before_action -> { check_params(:user_id) }, only: [:index, :destroy, :create_3d]
+
+  rescue_from StandardError do |e|
+    Rails.logger.error "Error: #{e}"
+    render json: { 'msg' => e.message }, status: :internal_server_error
+  end
+
   def index
     user_id = params[:user_id]
     ImageObject.where(created_by: user_id).each { |obj| obj.destroy if obj.images.empty? } # imageが存在しないobjectは削除
@@ -7,29 +15,26 @@ class Gyve::V1::ObjectsController < ApplicationController
       obj.info
     end
     render json: { 'msg' => 'success', 'objects' => object_info }
-  rescue StandardError => e
-    Rails.logger.error "Error: #{e}"
-    render json: { 'msg' => e.message }, status: :internal_server_error
   end
 
   def destroy
-    object = ImageObject.includes(:images).find(params[:object_id])
-
-    # S3からオブジェクトを削除
-    object.images.each do |image|
-      image.delete_related_s3files
-      image.file.purge if image.file.attached?
-      # image.html_file.purge if image.html_file.attached?
+    @object.images.each do |image|
+      image.delete # image.delete関数内でobjectの削除も行う
     end
-
-    # データベースからオブジェクトを削除
-    object.destroy
-
     render json: { 'msg' => 'S3 objects and DB record deleted successfully.' }
-  rescue ActiveRecord::RecordNotFound
-    render json: { 'msg' => 'Error: Object not found in DB.' }, status: :not_found
-  rescue StandardError => e
-    Rails.logger.error "Error deleting objects from S3 and DB: #{e}"
-    render json: { 'msg' => "Error deleting objects from S3 and DB: #{e}" }, status: :internal_server_error
+  end
+
+  def create_3d
+    iterations = 3000
+    # splatsモデルは現状未作成のため、splatsコントローラーを呼び出す
+    @splats = Gyve::V1::SplatsController.new
+    @splats.create_ply(@object.id, iterations)
+    render json: { 'msg' => '0# 作成リクエストを受け付けました。' }
+  end
+
+  private
+
+  def set_object
+    @object = ImageObject.create_if_none(params)
   end
 end
