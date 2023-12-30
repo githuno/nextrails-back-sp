@@ -16,7 +16,7 @@ class Gyve::V1::VideosController < ApplicationController
   end
 
   def create
-    raise 'Invalid file extension.' unless params[:image_path].end_with?('.mp4') # 拡張子がmp4でなければエラーを返す
+    # raise 'Invalid file extension.' unless params[:image_path].end_with?('.mp4') # 拡張子がmp4でなければエラーを返す
     base_name = get_basename(params[:image_path]) # (ApplicationController)
     image_path = "#{ENV['S3_PUBLIC_URL']}/#{@object.id}/#{base_name}.mp4"
     @image = Image.create!(object_id: @object.id, image_path: image_path, updated_by: params[:user_id])
