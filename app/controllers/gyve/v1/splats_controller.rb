@@ -27,29 +27,41 @@ class Gyve::V1::SplatsController < ApplicationController
   end
 
   def create_splat
-    # puts '>> GyveJob.perform_later is started'
+    puts '>> GAUSSIAN RESPONSE HOOK is started'
+    Rails.logger.debug '>> GAUSSIAN RESPONSE HOOK is started'
     # GyveJob.perform_later('tiktak', 'create_splat') # Threadsが非推奨のため、後で検証する
     # puts '>> GyveJob is working... log/development.logを確認してください'
     # Procfileでworkerを同時起動（bundle exec sidekiq -q default）する必要がある。
     # また、upstashへのコマンドリクエストが大量発生しており、検証が必要。
-    Rails.logger.debug '>> GAUSSIAN RESPONSE HOOK is started'
-    status = request.headers['PLY_STATUS']
-    obj_id = request.headers['PLY_ID']
+    
+    status = request.headers['HTTP_PLY_STATUS']
+    puts "status is #{status}" # DEBUG
+    obj_id = request.headers['HTTP_PLY_ID']
+    # obj_id = request.headers['HTTP_PLY_ID'].tr('"', '')
+    puts "obj_id is #{obj_id}" # DEBUG
     file = params[:file]
     @object = ImageObject.find_by(id: obj_id)
-    plyfile = "#{Rails.root}/tmp/#{obj_id}/point_cloud.ply"
+    puts "2: object is #{@object}" # DEBUG
+    dir_path = "#{Rails.root}/tmp/#{obj_id}"
+    FileUtils.mkdir_p(dir_path) unless Dir.exist?(dir_path)
+    plyfile = "#{dir_path}/point_cloud.ply"
 
     # # DEBUG-------------------------------------------------------------------
     # Rails.logger.debug '>> DEBUG: Using local file instead of request body'
-    # plyfile = "#{Rails.root}/tmp/63fd89ec-3052-4079-a6cb-e626a121218f/output/point_cloud.ply"
+    # plyfile = "#{dir_path}/63fd89ec-3052-4079-a6cb-e626a121218f/output/point_cloud.ply"
     # Rails.logger.debug ">> DEBUG: plyfile = #{plyfile}"
     # # DEBUG-------------------------------------------------------------------
     
     if file.present?
       begin
+        puts ">> DEBUG: Writing #{plyfile}"
+        tiktak_thread = Thread.new { tiktak('write') } # (ApplicationController)
+        puts ">> DEBUG: tiktak_thread is #{tiktak_thread}"
         File.open(plyfile, 'wb') do |f|
           f.write(file.read)
+          puts ">> DEBUG: Wrote #{plyfile}"
         end
+        tiktak_thread.kill
         Thread.new do
           convert_and_upload(@object, plyfile)
         end
@@ -59,8 +71,10 @@ class Gyve::V1::SplatsController < ApplicationController
     end
 
     # Update the database at the end
+    puts ">> DEBUG: Updating condition3d to #{status}" # DEBUG
     Rails.logger.debug ">> DEBUG: Updating condition3d to #{status}" # DEBUG
-    @object.update(condition3d: status)
+    @object.update!(condition3d: status)
+    render json: { 'msg' => 'splat is creating...' }, status: :ok # 200
   end
 
   private
@@ -79,11 +93,8 @@ class Gyve::V1::SplatsController < ApplicationController
     # ply_key = "#{object.id}/output/point_cloud.ply"
     # @object.plyfile.attach(io: File.open(ply_path), key: ply_key ,filename: 'point_cloud.ply')
 
-    # # Delete the temporary file
-    FileUtils.rm_f(ply_path)
-    Rails.logger.debug ">> DEBUG: Deleted #{ply_path}"
-    FileUtils.rm_f(splat_path)
-    Rails.logger.debug ">> DEBUG: Deleted #{splat_path}"
+    # # Delete the directory
+    FileUtils.rm_rf("#{Rails.root}/tmp/#{object.id}")
 
     # Request to delete the Gaussian workspace
     g_req_destroy_work(object.id)
