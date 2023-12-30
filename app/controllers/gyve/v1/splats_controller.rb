@@ -49,6 +49,7 @@ class Gyve::V1::SplatsController < ApplicationController
       begin
         File.open(plyfile, 'wb') do |f|
           f.write(file.read)
+        end
         Thread.new do
           convert_and_upload(@object, plyfile)
         end
