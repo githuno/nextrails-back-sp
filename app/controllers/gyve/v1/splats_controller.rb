@@ -40,6 +40,15 @@ class Gyve::V1::SplatsController < ApplicationController
     status = request.headers['HTTP_PLY_STATUS']
     obj_id = request.headers['HTTP_PLY_ID']
     file = params[:file]
+
+    # # CURL でのリクエスト方法----------------------------------------------------
+    # curl --request POST \
+    # --url https://refurnish.onrender.com/gyve/v1/return_ply \
+    # --header 'PLY_ID: 63fd89ec-3052-4079-a6cb-e626a121218f' \
+    # --header 'PLY_STATUS: text' \ # ✘ 'PLY_STATUS: "text"'
+    # -F 'file=@./point_cloud.ply' # ✘ --data "file: './point_cloud.ply'"
+    # # --------------------------------------------------------------------------
+
     @object = ImageObject.find_by(id: obj_id)
     @dir_path = "#{Rails.root}/tmp/#{obj_id}"
     FileUtils.mkdir_p(@dir_path) unless Dir.exist?(@dir_path)
