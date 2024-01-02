@@ -10,9 +10,6 @@ gem install bundler -v 2.5.3
 # ffiのキャッシュを有効化
 bundle config set --local BUNDLE_CACHE__FFI true
 
-# ネットワークを使うGemのインストールをスキップ
-bundle config set --local without 'network'
-
 # 不要なgemをインストールしない
 bundle config set --local without 'development test'
 
