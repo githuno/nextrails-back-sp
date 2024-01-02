@@ -79,5 +79,5 @@ production:
   host: <%= ENV['DEV_DB_HOST'] %>
   user: <%= ENV['DEV_DB_USR'] %>
   password: <%= ENV['DEV_DB_PW'] %>
-  database: test
+  database: carbon-captain-5423.test
   requiressl: true
