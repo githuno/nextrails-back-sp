@@ -1,6 +1,5 @@
 ARG RUBY_VERSION=3.1.2
 ARG TAILSCALE_VERSEION=1.14.0
-ENV APP_ROOT='/app'
 
 FROM ruby:${RUBY_VERSION}-alpine
 
@@ -28,6 +27,7 @@ RUN curl --create-dirs -o $HOME/.postgresql/root.crt \
     'https://cockroachlabs.cloud/clusters/37f989f0-20e5-4ff7-834b-9f3146527512/cert'
 
 # RUN mkdir ${APP_ROOT}
+ENV APP_ROOT='/app'
 WORKDIR ${APP_ROOT}
 
 # COPY Gemfile ${APP_ROOT}/Gemfile
