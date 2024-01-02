@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+echo "####### in entrypoint.sh"
+echo "####### pwd: $(pwd)"
+echo "####### ls: $(ls)"
+echo "####### DATABASE_URL: $DATABASE_URL"
+
 # Remove a potentially pre-existing server.pid for Rails.
 rm -f /myapp/tmp/pids/server.pid
 

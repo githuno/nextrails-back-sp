@@ -1,6 +1,6 @@
 FROM ruby:3.1.2
 
-ENV APP_ROOT='/app' TAILSCALE_KEY=''
+ENV APP_ROOT='/app'
 
 RUN apt-get update && apt-get install -y \
     build-essential libpq-dev libmsgpack-dev \
@@ -33,7 +33,11 @@ COPY . ${APP_ROOT}
 # EXPOSE 3000
 
 COPY .deploy/production/entrypoint.sh /usr/bin/
-RUN chmod +x /usr/bin/entrypoint.sh
+RUN >> EOT
+    chmod +x /usr/bin/entrypoint.sh
+    echo `${DATABASE_URL}`
+EOT
+
 ENTRYPOINT ["entrypoint.sh"]
 
 # CMD [ "dumb-init", "/bin/sh" ]
