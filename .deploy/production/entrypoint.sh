@@ -5,7 +5,6 @@ set -e
 rm -f /myapp/tmp/pids/server.pid
 
 # Gemとbundlerのバージョンを合わせる
-gem update --system
 gem install bundler -v 2.5.3
 
 # Then exec the container's main process (what's set as CMD in the Dockerfile).
