@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
     build-essential libpq-dev \
     sqlite-dev postgresql-dev postgresql-client mysql-client \
     # vim nano bash \
-    git wget curl nodejs \
+    # git wget curl nodejs \
     # sudo shadow dumb-init \
    && apt-get clean \
    && rm -rf /var/lib/apt/lists/*
