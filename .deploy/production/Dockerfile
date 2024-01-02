@@ -34,8 +34,6 @@ COPY . ${APP_ROOT}
 
 COPY .deploy/production/entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
-RUN echo `${DATABASE_URL}`
-
 ENTRYPOINT ["entrypoint.sh"]
 
 # CMD [ "dumb-init", "/bin/sh" ]
