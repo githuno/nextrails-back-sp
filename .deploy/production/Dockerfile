@@ -1,26 +1,31 @@
 ARG RUBY_VERSION=3.1.2
 ARG TAILSCALE_VERSEION=1.14.0
 
-FROM ruby:${RUBY_VERSION}-alpine
+# FROM ruby:${RUBY_VERSION}-alpine
+# RUN apk update && apk add --no-cache \
+#     alpine-sdk build-base gcompat \
+#     postgresql-dev postgresql-client \
+#     # sqlite-dev mysql-client \
+#     vim nano bash \
+#     git wget curl nodejs \
+#     sudo dumb-init shadow \
+#    && rm -rf /var/cache/apk/*
 
-RUN apk update && apk add --no-cache \
-    # build-essential libmsgpack-dev \
-    # libpq-dev postgresql-server-dev-all \
-    alpine-sdk build-base gcompat \
-    sqlite-dev postgresql-dev postgresql-client mysql-client \
+FROM ruby:${RUBY_VERSION}
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential libmsgpack-dev \
+    libpq-dev postgresql postgresql-contrib \
+    # postgresql-server-dev-all \
     vim nano bash \
     git wget curl nodejs \
     sudo dumb-init \
-    # shadow \
-   && rm -rf /var/cache/apk/*
+   && apt-get clean \
+   && rm -rf /var/lib/apt/lists/*
 
 # Tailscale
-# RUN wget https://pkgs.tailscale.com/stable/tailscale_${TAILSCALE_VERSEION}_amd64.tgz \
-#     && tar xzvf tailscale_${TAILSCALE_VERSEION}_amd64.tgz \
-#     && mv tailscale_${TAILSCALE_VERSEION}_amd64/tailscale* /usr/bin/
-# RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
-#     && curl https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list \
-#     && sudo apt-get update && sudo apt-get -y install tailscale 
+RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
+    && curl https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list \
+    && sudo apt-get update && sudo apt-get -y install tailscale 
     # && sudo tailscale up --authkey ${TAILSCALE_KEY}
 
 # cockroachdb
