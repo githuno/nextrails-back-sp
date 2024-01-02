@@ -16,8 +16,8 @@ bundle config set --local without 'development test'
 # 必要なgemがすでにインストールされているか確認
 bundle check || bundle install -j2 --retry=2 # 並列実行数を指定してエラー対策 {Ran out of memory (used over 512MB) while running your code.}
 
-# bundle exec rake assets:precompile # 静的アセット(css, js, img)を事前に一つのファイルに結合コンパイル
-# bundle exec rake assets:clean # アセットパイプラインによって生成された古い静的アセットをクリーンアップ
+# bundle exec rails assets:precompile RAILS_ENV=production # 静的アセット(css, js, img)を事前に一つのファイルに結合コンパイル
+# bundle exec rails assets:clean RAILS_ENV=production # アセットパイプラインによって生成された古い静的アセットをクリーンアップ
 #
 # # libディレクトリ内に配置されたJavaScriptファイルが、Railsのビューで使用される静的アセットとしてではなく、
 # # Open3.popen3などの方法で直接実行されるスクリプトとして使用される場合、rake assets:precompileは不要です。
@@ -29,8 +29,9 @@ bundle check || bundle install -j2 --retry=2 # 並列実行数を指定してエ
 # # したがって、libディレクトリ内のJavaScriptファイルを直接実行する場合、
 # # rake assets:precompileを実行する必要はありません。
 
-bundle exec rake db:migrate # データベースのマイグレーション
-# bundle exec rails db:seed_xxxxx # データベースの初期化
+bundle exec rails db:migrate RAILS_ENV=production
+# || bundle exec rails db:create && bundle exec rails schema:load
 
+# bundle exec rails db:seed_xxxxx # データベースの初期化
 
 exec "$@"
