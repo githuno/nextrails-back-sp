@@ -6,6 +6,9 @@ echo "####### pwd: $(pwd)"
 echo "####### ls: $(ls)"
 echo "####### DATABASE_URL: $DATABASE_URL"
 
+apt-get update && apt-get install -y \
+    postgresql-dev postgresql-client
+
 # Remove a potentially pre-existing server.pid for Rails.
 rm -f /myapp/tmp/pids/server.pid
 
