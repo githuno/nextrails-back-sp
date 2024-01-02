@@ -5,8 +5,9 @@ ENV APP_ROOT='/app' TAILSCALE_KEY=''
 RUN apt-get update && apt-get install -y \
     build-essential libpq-dev \
     sqlite-dev postgresql-dev postgresql-client mysql-client \
-    # git wget vim nano curl nodejs \
-    sudo bash shadow dumb-init \
+     vim nano \
+    # git wget curl nodejs \
+    # sudo bash shadow dumb-init \
    && apt-get clean \
    && rm -rf /var/lib/apt/lists/*
 
