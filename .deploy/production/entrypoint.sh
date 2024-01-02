@@ -17,7 +17,7 @@ bundle config set --local without 'network'
 bundle config set --local without 'development test'
 
 # 必要なgemがすでにインストールされているか確認
-bundle check || bundle install -j4 # 並列実行数を指定してエラー対策 {Ran out of memory (used over 512MB) while running your code.}
+bundle check || bundle install -j4 --retry=2 # 並列実行数を指定してエラー対策 {Ran out of memory (used over 512MB) while running your code.}
 
 # bundle exec rake assets:precompile # 静的アセット(css, js, img)を事前に一つのファイルに結合コンパイル
 # bundle exec rake assets:clean # アセットパイプラインによって生成された古い静的アセットをクリーンアップ
