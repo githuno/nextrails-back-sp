@@ -15,8 +15,8 @@ RUN apt-get update && apt-get install -y \
 # Tailscale
 RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
     && curl https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list \
-    && sudo apt-get update && sudo apt-get -y install tailscale \
-    && sudo tailscale up --authkey ${TAILSCALE_KEY}
+    && sudo apt-get update && sudo apt-get -y install tailscale 
+    # && sudo tailscale up --authkey ${TAILSCALE_KEY}
 
 # cockroachdb
 RUN curl --create-dirs -o $HOME/.postgresql/root.crt \
