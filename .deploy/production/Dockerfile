@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     git wget curl nodejs \
     sudo dumb-init \
     # shadow \
-   && apt-get clean
+   && apt-get clean \
    && rm -rf /var/lib/apt/lists/*
 
 # RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
