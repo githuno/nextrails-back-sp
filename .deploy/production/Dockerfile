@@ -15,7 +15,7 @@ FROM ruby:${RUBY_VERSION}
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libmsgpack-dev \
     libpq-dev postgresql postgresql-contrib \
-    sqlite3 libsqlite3-dev mysql-client libmysqlclient-dev \
+    sqlite3 libsqlite3-dev mysql-server \
     vim nano bash \
     git wget curl nodejs \
     sudo dumb-init \
