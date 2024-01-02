@@ -4,7 +4,7 @@
 #   gem install pg
 # Configure Using Gemfile
 # gem "pg"
-#
+
 default: &default # &defaultはYAMLのアンカー（Anchor）で、この部分を&defaultと名前付けています。これにより、他の場所で同じ設定を共有できるようになります。
   adapter: cockroachdb # 使用するデータベースのアダプターを指定します。この場合、PostgreSQLを使用します。
   encoding: unicode # データベースのエンコーディングをUnicodeに設定します。
@@ -33,7 +33,7 @@ test:
 #   sslrootcert: './root.crt'
 #   options: "--cluster=carbon-captain"
 
-production: &default
+production:
   adapter: cockroachdb
   url: <%= ENV['DATABASE_URL'] %>
 
