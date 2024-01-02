@@ -33,7 +33,6 @@ bundle check || bundle install -j4 --retry=2 # 並列実行数を指定してエ
 # # rake assets:precompileを実行する必要はありません。
 
 bundle exec rake db:migrate # データベースのマイグレーション
-# bundle exec rails db:migrate # 調べる
-# bundle exec rails db:seed_fu # 調べる
+# bundle exec rails db:seed_xxxxx # データベースの初期化
 
 exec "$@"
