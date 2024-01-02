@@ -32,6 +32,5 @@ bundle check || bundle install -j2 --retry=2 # 並列実行数を指定してエ
 bundle exec rake db:migrate # データベースのマイグレーション
 # bundle exec rails db:seed_xxxxx # データベースの初期化
 
-sudo tailscale up --authkey ${TAILSCALE_KEY}
 
 exec "$@"
