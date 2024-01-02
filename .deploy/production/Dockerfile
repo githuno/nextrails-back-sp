@@ -29,7 +29,7 @@ COPY Gemfile.lock ${APP_ROOT}/Gemfile.lock
 
 COPY . ${APP_ROOT}
 
-EXPOSE 3000
+# EXPOSE 3000
 
 COPY .deploy/production/entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
