@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y \
     # vim nano bash \
     # git wget curl nodejs \
     # sudo shadow dumb-init \
-   && apt-get clean \
-   && rm -rf /var/lib/apt/lists/*
+   && apt-get clean
+#    && rm -rf /var/lib/apt/lists/*
 
 RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
     && curl https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list \
