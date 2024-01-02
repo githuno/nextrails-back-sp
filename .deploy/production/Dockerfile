@@ -4,8 +4,9 @@ ARG TAILSCALE_VERSEION=1.14.0
 FROM ruby:${RUBY_VERSION}-alpine
 
 RUN apk update && apk add --no-cache \
-    build-essential libmsgpack-dev \
+    # build-essential libmsgpack-dev \
     # libpq-dev postgresql-server-dev-all \
+    alpine-sdk build-base gcompat \
     sqlite-dev postgresql-dev postgresql-client mysql-client \
     vim nano bash \
     git wget curl nodejs \
