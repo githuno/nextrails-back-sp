@@ -17,6 +17,10 @@ RUN apt-get update && apt-get install -y \
 #     && sudo apt-get update && sudo apt-get install tailscale \
 #     && sudo tailscale up --authkey ${TAILSCALE_KEY}
 
+# cockroachdb
+RUN curl --create-dirs -o $HOME/.postgresql/root.crt \
+    'https://cockroachlabs.cloud/clusters/37f989f0-20e5-4ff7-834b-9f3146527512/cert'
+
 RUN mkdir ${APP_ROOT}
 WORKDIR ${APP_ROOT}
 
