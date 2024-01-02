@@ -15,9 +15,9 @@ RUN apk update && apk add --no-cache \
    && rm -rf /var/cache/apk/*
 
 # Tailscale
-RUN wget https://pkgs.tailscale.com/stable/tailscale_${TAILSCALE_VERSEION}_amd64.tgz \
-    && tar xzvf tailscale_${TAILSCALE_VERSEION}_amd64.tgz \
-    && mv tailscale_${TAILSCALE_VERSEION}_amd64/tailscale* /usr/bin/
+# RUN wget https://pkgs.tailscale.com/stable/tailscale_${TAILSCALE_VERSEION}_amd64.tgz \
+#     && tar xzvf tailscale_${TAILSCALE_VERSEION}_amd64.tgz \
+#     && mv tailscale_${TAILSCALE_VERSEION}_amd64/tailscale* /usr/bin/
 # RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
 #     && curl https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list \
 #     && sudo apt-get update && sudo apt-get -y install tailscale 
