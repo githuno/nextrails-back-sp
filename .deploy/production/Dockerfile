@@ -2,7 +2,7 @@ FROM ruby:3.1.2
 
 ENV APP_ROOT='/app'
 
-RUN apt-get upgrade && apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y \
     build-essential libmsgpack-dev \
     # libpq-dev postgresql-server-dev-all \
     # sqlite-dev postgresql-dev postgresql-client mysql-client \
@@ -14,9 +14,10 @@ RUN apt-get upgrade && apt-get update && apt-get install -y \
    && rm -rf /var/lib/apt/lists/*
 
 # postgresql (postgresql-client-12 postgresql-12 libpq-dev postgresql-server-dev-12 :https://www.postgresql.org/download/linux/ubuntu/)
-RUN sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
-    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - \
-    && sudo apt-get update && sudo apt-get -y install postgresql
+RUN echo "deb https://apt.postgresql.org/pub/repos/apt $(grep VERSION_CODENAME /etc/os-release | cut -d= -f2)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor - | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg \
+    && echo "signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg" > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update && apt-get -y install postgresql
 
 # Tailscale
 RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
