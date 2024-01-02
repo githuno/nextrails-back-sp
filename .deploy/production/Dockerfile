@@ -33,10 +33,8 @@ COPY . ${APP_ROOT}
 # EXPOSE 3000
 
 COPY .deploy/production/entrypoint.sh /usr/bin/
-RUN << EOT
-    chmod +x /usr/bin/entrypoint.sh
-    echo `${DATABASE_URL}`
-EOT
+RUN chmod +x /usr/bin/entrypoint.sh
+RUN echo `${DATABASE_URL}`
 
 ENTRYPOINT ["entrypoint.sh"]
 
