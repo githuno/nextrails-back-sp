@@ -22,7 +22,7 @@ COPY Gemfile.lock ${APP_ROOT}/Gemfile.lock
 
 COPY . ${APP_ROOT}
 
-COPY .deploy/prodution/entrypoint.sh /usr/bin/
+COPY .deploy/production/entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 
