@@ -9,6 +9,7 @@ gem install bundler -v 2.5.3
 
 # Then exec the container's main process (what's set as CMD in the Dockerfile).
 bundle config set --local without 'development test' # 調べる
+bundle config --local jobs 4
 bundle install
 bundle exec rake assets:precompile # 調べる
 bundle exec rake assets:clean # 調べる
