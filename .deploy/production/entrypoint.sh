@@ -9,11 +9,12 @@ git clone https://github.com/cockroachlabs/example-app-ruby-activerecord
 cd example-app-ruby-activerecord
 which libpq
 bundle config --local build.pg --with-opt-dir=/usr/local/opt/libpq
-
 cd /app
 
 # Gemとbundlerのバージョンを合わせる
 gem install bundler -v 2.5.3
+
+bundle lock --add-platform x86_64-linux;
 
 # ffiのキャッシュを有効化
 bundle config set --local BUNDLE_CACHE__FFI true
@@ -37,7 +38,8 @@ bundle check || bundle install -j2 --retry=2 # 並列実行数を指定してエ
 # # したがって、libディレクトリ内のJavaScriptファイルを直接実行する場合、
 # # rake assets:precompileを実行する必要はありません。
 
-bundle exec rails db:migrate RAILS_ENV=production
+bundle exec rails db:migrate
+# bundle exec rails db:migrate RAILS_ENV=production
 # || bundle exec rails db:create && bundle exec rails schema:load
 
 # bundle exec rails db:seed_xxxxx # データベースの初期化
