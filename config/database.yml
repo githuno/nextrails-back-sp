@@ -28,10 +28,10 @@ production:
   host: <%= ENV['DEV_DB_HOST'] %>
   user: <%= ENV['DEV_DB_USR'] %>
   password: <%= ENV['DEV_DB_PW'] %>
-  database: test
+  database: carbon-captain.test
   sslmode: 'verify-full'
   sslrootcert: './root.crt'
-  options: "--cluster=carbon-captain-5423"
+  options: "--cluster=carbon-captain"
 
 # cockroachdbの場合:https://www.cockroachlabs.com/blog/how-to-a-complete-web-app-with-rails-and-cockroachdb/
 # default: &default
