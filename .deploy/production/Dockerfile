@@ -4,7 +4,8 @@ ENV APP_ROOT='/app'
 
 RUN apt-get upgrade && apt-get update && apt-get install -y \
     build-essential libpq-dev libmsgpack-dev \
-    postgresql-server-dev-all \
+    # postgresql-server-dev-all \
+    postgresql-dev postgresql-client \
     # sqlite-dev postgresql-dev postgresql-client mysql-client \
     vim nano bash \
     git wget curl nodejs \
