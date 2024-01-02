@@ -2,13 +2,14 @@ FROM ruby:3.1.2
 
 ENV APP_ROOT='/app' TAILSCALE_KEY=''
 
-RUN apt-get update && apt-get install -y \
+RUN apt update && apt install -y \
     build-essential libpq-dev \
-    sqlite-dev postgresql-dev postgresql-client mysql-client \
+    # sqlite-dev postgresql-dev postgresql-client mysql-client \
     vim nano bash \
     git wget curl nodejs \
-    sudo shadow dumb-init \
-   && apt-get clean \
+    sudo dumb-init \
+    # shadow \
+   && apt clean \
    && rm -rf /var/lib/apt/lists/*
 
 # RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
