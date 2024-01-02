@@ -23,6 +23,10 @@ test:
   <<: *default
   database: app_test
 
+production:
+  adapter: cockroachdb
+  url: <%= ENV['DATABASE_URL'] %>
+
 # production:
 #   <<: *default # defaultセクションの設定をそのまま引き継ぎます。これにより、重複を避けながら設定を共有できます。
 #   host: <%= ENV['DEV_DB_HOST'] %>
@@ -32,10 +36,6 @@ test:
 #   sslmode: 'verify-full'
 #   sslrootcert: './root.crt'
 #   options: "--cluster=carbon-captain"
-
-production:
-  adapter: cockroachdb
-  url: <%= ENV['DATABASE_URL'] %>
 
 # cockroachdbの場合:https://www.cockroachlabs.com/blog/how-to-a-complete-web-app-with-rails-and-cockroachdb/
 # default: &default
