@@ -1,28 +1,26 @@
-FROM ruby:3.1.2
-
+ARG RUBY_VERSION=3.1.2
+ARG TAILSCALE_VERSEION=1.14.0
 ENV APP_ROOT='/app'
 
-RUN apt-get update && apt-get install -y \
+FROM ruby:${RUBY_VERSION}-alpine
+
+RUN apk update && apk add --no-cache \
     build-essential libmsgpack-dev \
     # libpq-dev postgresql-server-dev-all \
-    # sqlite-dev postgresql-dev postgresql-client mysql-client \
+    sqlite-dev postgresql-dev postgresql-client mysql-client \
     vim nano bash \
     git wget curl nodejs \
     sudo dumb-init \
     # shadow \
-   && apt-get clean \
-   && rm -rf /var/lib/apt/lists/*
-
-# postgresql (postgresql-client-12 postgresql-12 libpq-dev postgresql-server-dev-12 :https://www.postgresql.org/download/linux/ubuntu/)
-RUN echo "deb https://apt.postgresql.org/pub/repos/apt $(grep VERSION_CODENAME /etc/os-release | cut -d= -f2)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
-    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor - | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg \
-    && echo "signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg" >> /etc/apt/sources.list.d/pgdg.list \
-    && apt-get update && apt-get -y install postgresql
+   && rm -rf /var/cache/apk/*
 
 # Tailscale
-RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
-    && curl https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list \
-    && sudo apt-get update && sudo apt-get -y install tailscale 
+RUN wget https://pkgs.tailscale.com/stable/tailscale_${TAILSCALE_VERSEION}_amd64.tgz \
+    && tar xzvf tailscale_${TAILSCALE_VERSEION}_amd64.tgz \
+    && mv tailscale_${TAILSCALE_VERSEION}_amd64/tailscale* /usr/bin/
+# RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
+#     && curl https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list \
+#     && sudo apt-get update && sudo apt-get -y install tailscale 
     # && sudo tailscale up --authkey ${TAILSCALE_KEY}
 
 # cockroachdb
