@@ -4,17 +4,10 @@ set -e
 # Remove a potentially pre-existing server.pid for Rails.
 rm -f /myapp/tmp/pids/server.pid
 
-# # cockroachdb：https://www.cockroachlabs.com/docs/v23.1/build-a-ruby-app-with-cockroachdb-activerecord
-# git clone https://github.com/cockroachlabs/example-app-ruby-activerecord
-# cd example-app-ruby-activerecord
-# which libpq
-# bundle config --local build.pg --with-opt-dir=/usr/local/opt/libpq
-# cd /app
-
 # Gemとbundlerのバージョンを合わせる
 gem install bundler -v 2.5.3
 
-bundle lock --add-platform x86_64-linux;
+# bundle lock --add-platform x86_64-linux;
 
 # ffiのキャッシュを有効化
 bundle config set --local BUNDLE_CACHE__FFI true

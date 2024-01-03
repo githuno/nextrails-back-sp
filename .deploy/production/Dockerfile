@@ -48,5 +48,5 @@ RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 
 # CMD [ "dumb-init", "/bin/sh" ]
-CMD [ "rails","server","--bind","0.0.0.0","--environment","production" ]
+CMD [ "rails","server","--environment","production" ]
 # CMD [ "rails","server","--bind","0.0.0.0","--environment","production" ]
