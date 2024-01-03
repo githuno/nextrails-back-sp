@@ -7,8 +7,6 @@ rm -f /myapp/tmp/pids/server.pid
 # Gemとbundlerのバージョンを合わせる
 gem install bundler -v 2.5.3
 
-# bundle lock --add-platform x86_64-linux;
-
 # ffiのキャッシュを有効化
 bundle config set --local BUNDLE_CACHE__FFI true
 
