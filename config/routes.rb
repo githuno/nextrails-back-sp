@@ -1,9 +1,17 @@
-require "sidekiq/web"
-
 Rails.application.routes.draw do
-  # redis
-  mount Sidekiq::Web => "/sidekiq"
+
+  # # redis
+  # if Rails.env.development?
+  #   require 'sidekiq/web'
+  #   # localhost:3000/sidekiqにアクセスすると、Sidekiqの管理画面が表示される。
+  #   # ただし、バックグラウンドでupstashへ大量のリクエストを送信し続ける。
+  #   mount Sidekiq::Web => '/sidekiq'
+  # end
+
+  # root
   get '/', to: 'hello#create'
+
+  # API test
   namespace :api do
     namespace :v1 do
       resources :posts, only: [:index, :show, :create, :update, :destroy]
@@ -11,6 +19,7 @@ Rails.application.routes.draw do
   end
   resources :posts
 
+  # Gyve API
   namespace :gyve do
     namespace :v1 do
       post '/get_images', to: 'images#show'
@@ -23,6 +32,10 @@ Rails.application.routes.draw do
       post '/create_3d', to: 'objects#create_3d'
       # gaussian
       post '/return_ply', to: 'splats#create_splat'
+      # redis_test
+      # get '/redis_test', to: 'redis_test#test'
+      # tailscale
+      get '/tail', to: 'tailscale#up'
     end
   end
   
