@@ -19,6 +19,9 @@ Rails.application.routes.draw do
   end
   resources :posts
 
+  # Tailscale API
+  get '/tail', to: 'tailscale#up'
+
   # Gyve API
   namespace :gyve do
     namespace :v1 do
@@ -34,8 +37,6 @@ Rails.application.routes.draw do
       post '/return_ply', to: 'splats#create_splat'
       # redis_test
       # get '/redis_test', to: 'redis_test#test'
-      # tailscale
-      get '/tail', to: 'tailscale#up'
     end
   end
   
