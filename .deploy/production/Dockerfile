@@ -41,12 +41,12 @@ WORKDIR ${APP_ROOT}
 
 COPY . ${APP_ROOT}
 
-# EXPOSE 3000
+EXPOSE 3000
 
 COPY .deploy/production/entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 
 # CMD [ "dumb-init", "/bin/sh" ]
-CMD [ "rails","server","--environment","production" ]
+CMD [ "rails","server","--bind=0.0.0.0", "--environment=production" ]
 # CMD [ "rails","server","--bind","0.0.0.0","--environment","production" ]
