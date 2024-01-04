@@ -35,4 +35,8 @@ bundle exec rails db:migrate
 
 # bundle exec rails db:seed_xxxxx # データベースの初期化
 
+# tailscale
+nohup tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 > /dev/null 2>&1 &
+echo ">> tailscaled.. success!!"
+
 exec "$@"

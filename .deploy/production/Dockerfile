@@ -8,7 +8,7 @@ ARG TAILSCALE_VERSEION=1.14.0
 #     # sqlite-dev mysql-client \
 #     vim nano bash \
 #     git wget curl nodejs \
-#     sudo dumb-init shadow \
+#     sudo dumb-init shadow tzdata \
 #    && rm -rf /var/cache/apk/*
 
 FROM ruby:${RUBY_VERSION}
@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add - \
     && curl https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list \
     && sudo apt-get update && sudo apt-get -y install tailscale \
-    && chmod +x /usr/bin/tailscale 
+    && mkdir -p /run/tailscale/ /var/lib/tailscale/ && chmod 1777 /run/tailscale/ /var/lib/tailscale/
     # && sudo tailscale up --authkey ${TAILSCALE_KEY}
 
 # cockroachdb

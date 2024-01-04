@@ -1,8 +1,5 @@
 require_relative "boot"
-
 require "rails/all"
-
-
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -12,10 +9,13 @@ module App
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
+
+    # # redis
     # config.active_job.queue_adapter = :sidekiq # sidekiq
     # config.middleware.use ActionDispatch::Cookies # sidekiq
     # config.middleware.use ActionDispatch::Session::CookieStore # sidekiq
-
+    # config.autoload_paths << Rails.root.join('lib') # sidekiq
+    # config.eager_load_paths << Rails.root.join('lib') # sidekiq
 
     # Configuration for the application, engines, and railties goes here.
     #

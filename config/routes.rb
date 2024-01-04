@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
 
-  # # redis
+  # # redis-GUI
   # if Rails.env.development?
   #   require 'sidekiq/web'
   #   # localhost:3000/sidekiqにアクセスすると、Sidekiqの管理画面が表示される。
@@ -10,6 +10,11 @@ Rails.application.routes.draw do
 
   # root
   get '/', to: 'hello#create'
+  # Tailscale API
+  get '/tail/up', to: 'tailscale#up'
+  get '/tail/check', to: 'tailscale#check'
+  get '/tail/down', to: 'tailscale#down'
+  get '/tail/status', to: 'tailscale#status'
 
   # API test
   namespace :api do
@@ -19,8 +24,6 @@ Rails.application.routes.draw do
   end
   resources :posts
 
-  # Tailscale API
-  get '/tail', to: 'tailscale#up'
 
   # Gyve API
   namespace :gyve do
