@@ -31,7 +31,9 @@ RUN curl https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add -
 
 # cockroachdb
 RUN curl --create-dirs -o $HOME/.postgresql/root.crt \
-    'https://cockroachlabs.cloud/clusters/37f989f0-20e5-4ff7-834b-9f3146527512/cert'
+    'https://cockroachlabs.cloud/clusters/37f989f0-20e5-4ff7-834b-9f3146527512/cert' \
+    # ccloud
+    && curl https://binaries.cockroachdb.com/ccloud/ccloud_linux-amd64_0.6.12.tar.gz | tar -xz && cp -i ccloud /usr/local/bin/
 
 # RUN mkdir ${APP_ROOT}
 ENV APP_ROOT='/app'
