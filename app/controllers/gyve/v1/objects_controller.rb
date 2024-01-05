@@ -29,7 +29,8 @@ class Gyve::V1::ObjectsController < ApplicationController
     # splatsモデルは現状未作成のため、splatsコントローラーを呼び出す
     @splats = Gyve::V1::SplatsController.new
     @splats.create_ply(@object.id, iterations)
-    render json: { 'msg' => '0# 作成リクエストを受け付けました。' }
+    puts '【🔨 Object_ctrl-> Splats_ctrl】0# 作成リクエストを受け付けました。' # DEBUG
+    render json: { 'msg' => '【Object_controller】0# 作成リクエストを受け付けました。' }
   end
 
   private

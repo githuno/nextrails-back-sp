@@ -1,12 +1,12 @@
 Rails.application.routes.draw do
 
   # # redis-GUI
-  # if Rails.env.development?
-  #   require 'sidekiq/web'
-  #   # localhost:3000/sidekiqにアクセスすると、Sidekiqの管理画面が表示される。
-  #   # ただし、バックグラウンドでupstashへ大量のリクエストを送信し続ける。
-  #   mount Sidekiq::Web => '/sidekiq'
-  # end
+  if Rails.env.development?
+    require 'sidekiq/web'
+    # localhost:3000/sidekiqにアクセスすると、Sidekiqの管理画面が表示される。
+    # ただし、バックグラウンドでupstashへ大量のリクエストを送信し続ける。
+    mount Sidekiq::Web => '/sidekiq'
+  end
 
   # root
   get '/', to: 'hello#create'
@@ -39,7 +39,7 @@ Rails.application.routes.draw do
       # gaussian
       post '/return_ply', to: 'splats#create_splat'
       # redis_test
-      # get '/redis_test', to: 'redis_test#test'
+      get '/redis_test', to: 'redis_test#test'
     end
   end
   

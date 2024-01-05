@@ -23,10 +23,12 @@ class Gyve::V1::SplatsController < ApplicationController
   end
 
   def create_ply(object_id, iterations) # 別のコントローラーから呼び出す
-    Thread.new do
+    Thread.new do # 元のスレッドとは異なるコンテキストで実行されるため、@_responseなどのインスタンス変数が初期化されていない可能性がある
       g_req_create_ply(object_id, iterations)
+      puts '【🔨 Splats_ctrl -> GAUSSIAN】0# 作成リクエストを受け付けました。' # DEBUG
     end
-    render json: { 'msg' => '0# 作成リクエストを受け付けました。' }
+    return
+    # render json: { 'msg' => '【Splats】0# 作成リクエストを受け付けました。' }
   end
 
   def create_splat
@@ -57,7 +59,7 @@ class Gyve::V1::SplatsController < ApplicationController
       tiktak_thread = Thread.new { tiktak('convert') } # (ApplicationController)
       thread_result = Thread.new do
         convert_and_upload(@object, file.tempfile)
-        '0# Conversion and upload successful'
+        '10# SPLAT-Conversion and upload successful'
       rescue StandardError => e
         "9# #{e.message}"
       end
@@ -65,9 +67,11 @@ class Gyve::V1::SplatsController < ApplicationController
       status = thread_result.value
     end
 
+    puts ">> DEBUG: status is #{status}" # DEBUG
     # Update the database temporarily
     @object.update!(condition3d: status)
     # Render temporarily
+    puts '🎉🎉🎉 Succeeded to convert ply to splat'
     render json: { 'msg' => 'THREAD convert is creating...' }, status: :ok # 200
   end
 
@@ -121,15 +125,14 @@ class Gyve::V1::SplatsController < ApplicationController
       Rails.logger.debug ">> GAUSSIAN REQUEST <#{method}> is started"
       response = http.request(request)
       Rails.logger.debug "<< GAUSSIAN RESPONSE <#{method}> is <<#{response.body}>>"
+      response.read_body
     rescue Net::ReadTimeout => e
       Rails.logger.debug "❌ GAUSSIAN REQUEST <#{method}> timed out: #{e.message}"
-      raise "❌ GAUSSIAN REQUEST <#{method}> timed out: #{e.message}"
     end
-    response.read_body
   end
 
   def g_req_create_ply(object_id, iterations)
-    g_req('create/ply', { id: object_id, iterations: }, :post)
+    g_req('create/ply', { id: object_id, iterations: iterations}, :post)
   end
 
   def g_req_show_works
