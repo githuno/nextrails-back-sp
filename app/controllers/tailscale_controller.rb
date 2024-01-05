@@ -3,15 +3,15 @@ require 'open3'
 class TailscaleController < ApplicationController
     def up
         unless File.exist?("#{Rails.root}/tmp/tailscale.txt")
-            puts ">> tailscale up -ssh(initialize)" # 初回のみ実行
-            pid = Process.spawn("tailscale up -ssh > #{Rails.root}/tmp/tailscale.txt 2>&1 &")
+            puts ">> tailscale up --ssh(initialize)" # 初回のみ実行
+            pid = Process.spawn("tailscale up --ssh --hostname=#{ENV['SERVER_NAME']} > #{Rails.root}/tmp/tailscale.txt 2>&1 &")
             Process.detach(pid) # プロセスをデタッチしてバックグラウンドで実行
             sleep 3 # コマンドの出力を待つための小さな遅延
             output = File.read("#{Rails.root}/tmp/tailscale.txt")
             render plain: output
         else
             puts ">> tailscale up -ssh"
-            pid = Process.spawn('tailscale up -ssh > /dev/null 2>&1 &')
+            pid = Process.spawn('tailscale up --ssh > /dev/null 2>&1 &')
             Process.detach(pid)
             puts "up 🎉"
             render json: { message: "up 🎉" }, status: :ok
