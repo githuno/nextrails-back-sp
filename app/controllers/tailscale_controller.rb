@@ -10,8 +10,8 @@ class TailscaleController < ApplicationController
             output = File.read("#{Rails.root}/tmp/tailscale.txt")
             render plain: output
         else
-            puts ">> tailscale up -ssh"
-            pid = Process.spawn('tailscale up --ssh > /dev/null 2>&1 &')
+            puts ">> tailscale up --ssh"
+            pid = Process.spawn("tailscale up --ssh --hostname=#{ENV['SERVER_NAME']} > /dev/null 2>&1 &")
             Process.detach(pid)
             puts "up 🎉"
             render json: { message: "up 🎉" }, status: :ok
