@@ -2,16 +2,24 @@ class Image < ApplicationRecord
   belongs_to :object, class_name: 'ImageObject', foreign_key: 'object_id'
   has_many_attached :file, dependent: :destroy # 画像ファイルの他、html、mp4もアップロードする
 
-  def self.upload(object_id, user_id, data, now) # インスタンス生成も行うのでクラスメソッドとして定義
+  # インスタンス生成も行うのでクラスメソッドとして定義
+  def self.upload(object_id, user_id, data, now)
     begin
       # DBに登録
       filename = "#{now}.png"
       key = "#{object_id}/#{filename}"
       image_path = "#{ENV['S3_PUBLIC_URL']}/#{key}"
       image = Image.create!(object_id: object_id, image_path: image_path, updated_by: user_id) 
+
+      # データがBase64エンコードされた文字列か、ファイルアップロードオブジェクトかを判定
+      if data.is_a?(ActionDispatch::Http::UploadedFile)
+        io = data.tempfile
+      else
+        bytes = Base64.decode64(data)
+        io = StringIO.new(bytes)
+      end
+
       # S3にアップロード
-      bytes = Base64.decode64(data)
-      io = StringIO.new(bytes)
       image.file.attach(io: io, key: key, filename: filename, content_type: 'image/png')
       image # return
     rescue StandardError => e
