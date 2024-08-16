@@ -17,7 +17,17 @@ class S3ResourceService
   end
 
   def presigned_url(key, method)
-    resource.object(key).presigned_url(method, expires_in: 3600)
+    options = {
+      expires_in: 3600,
+      response_headers: {
+        'Access-Control-Allow-Origin' => '*',
+        'Access-Control-Allow-Methods' => 'GET, PUT, OPTIONS',
+        'Access-Control-Allow-Headers' => 'Content-Type, Authorization, x-amz-date, x-amz-content-sha256',
+        'Access-Control-Expose-Headers' => 'ETag'
+      }
+    }
+    resource.object(key).presigned_url(method, options)
+    # resource.object(key).presigned_url(method, expires_in: 3600)
   rescue Aws::S3::Errors::ServiceError => e
     raise "Failed to generate presigned URL: #{e.message}"
   end
