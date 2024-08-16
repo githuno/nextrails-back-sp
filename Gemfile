@@ -8,8 +8,6 @@ gem 'dotenv-rails'
 gem "rails", "~> 7.0.5"
 gem 'foreman', '~> 0.87.2'
 
-# Use postgresql as the database for Active Record
-# gem "pg", "~> 1.1"
 gem 'activerecord-cockroachdb-adapter', '~> 7.0.3'
 gem "activerecord-import"
 gem "aws-sdk-s3", "~> 1.122", require: false
@@ -47,6 +45,9 @@ gem "rack-cors"
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
+  # Use postgresql as the database for Active Record
+  gem "pg", "~> 1.1"
+  gem 'byebug', platforms: %i[ mri mingw x64_mingw ]
 end
 
 group :development do

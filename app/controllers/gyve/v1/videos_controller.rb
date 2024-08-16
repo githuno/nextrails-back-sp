@@ -11,7 +11,7 @@ class Gyve::V1::VideosController < ApplicationController
 
   def pre_create
     s3_key = "#{@object.id}/#{@now}.mp4"
-    presigned_url = @s3.object(s3_key).presigned_url(:post)
+    presigned_url = @s3.object(s3_key).presigned_url(:put)
     render json: { 'msg' => 'success', 'result' => [{ 'id' => @now, 'path' => presigned_url }] }
   end
 

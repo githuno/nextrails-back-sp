@@ -1,54 +1,43 @@
-# PostgreSQL. Versions 9.3 and up are supported.
-#
-# Install the pg driver:
-#   gem install pg
-# Configure Using Gemfile
-# gem "pg"
-
-# default: &default # &defaultはYAMLのアンカー（Anchor）で、この部分を&defaultと名前付けています。これにより、他の場所で同じ設定を共有できるようになります。
-#   adapter: cockroachdb # 使用するデータベースのアダプターを指定します。この場合、PostgreSQLを使用します。
-#   encoding: unicode # データベースのエンコーディングをUnicodeに設定します。
-#   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %> # コネクションプーリングの最大数を設定します。RAILS_MAX_THREADSという環境変数が存在すればそれを参照し、存在しなければデフォルトの値として5を使用します。
-#   port: 26257
-#   requiressl: true
-
-# development:
-#   <<: *default # defaultセクションの設定をそのまま引き継ぎます。これにより、重複を避けながら設定を共有できます。
-#   host: <%= ENV['DEV_DB_HOST'] %>
-#   user: <%= ENV['DEV_DB_USR'] %>
-#   password: <%= ENV['DEV_DB_PW'] %>
-#   database: test
-
-# production:
-#   <<: *default # defaultセクションの設定をそのまま引き継ぎます。これにより、重複を避けながら設定を共有できます。
-#   host: <%= ENV['DEV_DB_HOST'] %>
-#   user: <%= ENV['DEV_DB_USR'] %>
-#   password: <%= ENV['DEV_DB_PW'] %>
-#   database: test
-# -----------------------------------------------------
-
 # cockroachdbの場合:https://www.cockroachlabs.com/blog/how-to-a-complete-web-app-with-rails-and-cockroachdb/
 
-default: &default
-  adapter: cockroachdb
-  host: <%= ENV['DEV_DB_HOST'] %>
-  port: 26257
-  user: <%= ENV['DEV_DB_USR'] %>
-  password: <%= ENV['DEV_DB_PW'] %>
-  database: test  # carbon-captain-5423.test
-  sslmode: 'verify-full'  # 'true' or 'require' or 'verify-full'
-  sslrootcert: './root.crt' # ~/.postgresql/root.crt つまりpostgresが見ている相対位置
-  options: "--cluster=carbon-captain-5423"
+# cockroachdbの場合
+# default: &default
+  # adapter: cockroachdb
+  # host: <%= ENV['DEV_DB_HOST'] %>
+  # port: 26257
+  # user: <%= ENV['DEV_DB_USR'] %>
+  # password: <%= ENV['DEV_DB_PW'] %>
+  # database: test  # carbon-captain-5423.test
+  # sslmode: 'verify-full'  # 'true' or 'require' or 'verify-full'
+  # sslrootcert: './root.crt' # ~/.postgresql/root.crt つまりpostgresが見ている相対位置
+  # options: "--cluster=carbon-captain-5423"
  
+# development:
+  # <<: *default
+  # encoding: unicode # データベースのエンコーディングをUnicodeに設定します。
+  # pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %> # コネクションプーリングの最大数を設定します。RAILS_MAX_THREADSという環境変数が存在すればそれを参照し、存在しなければデフォルトの値として5を使用します。
+
+# -----------------------------------------------------  
+# postgresqlの場合
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see Rails configuration guide
+  # https://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PW'] %>
+  host: db
+
 development:
   <<: *default
-  encoding: unicode # データベースのエンコーディングをUnicodeに設定します。
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %> # コネクションプーリングの最大数を設定します。RAILS_MAX_THREADSという環境変数が存在すればそれを参照し、存在しなければデフォルトの値として5を使用します。
-  
+  database: app_development
+
 test:
   <<: *default
   database: app_test
- 
+
+# -----------------------------------------------------
 production:
   adapter: cockroachdb
   url: <%= ENV['DATABASE_URL'] %>
