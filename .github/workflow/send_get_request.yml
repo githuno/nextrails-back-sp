@@ -1,0 +1,17 @@
+name: Send GET request to RENDER_URL
+
+on:
+  schedule:
+    - cron: "*/14 9-23 * * *"  # 9:00-23:59 JST
+    - cron: "*/14 0-2 * * *"   # 00:00-02:59 JST
+
+jobs:
+  send_request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send GET request
+        env:
+          RENDER_URL: ${{ secrets.RENDER_URL }}
+        run: |
+          curl -X GET "$RENDER_URL"
