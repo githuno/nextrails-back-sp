@@ -1,12 +1,12 @@
-name: Send GET request to RENDER_URL
+name: Send HEAD request to RENDER_URL
 
 on:
   push:
     branches:
       - main # https://blog.cohu.dev/github-actions-cron-not-working/
   schedule: # https://qiita.com/tommy_aka_jps/items/5f4fe384008ffc9fa794
-    - cron: "*/5 9-23 * * *" # 9:00-23:59 JSTの間、5分毎に実行
-    - cron: "*/5 0-2 * * *" # 00:00-02:59 JSTの間、5分毎に実行
+    - cron: "*/3 9-23 * * *" # 9:00-23:59 JSTの間、3分毎に実行
+    - cron: "*/3 0-2 * * *" # 00:00-02:59 JSTの間、3分毎に実行
   # workflow_dispatch: # 手動トリガーの追加
 
 jobs:
@@ -15,8 +15,8 @@ jobs:
     environment: FOR_RENDER # 使用するEnvironmentを指定
 
     steps:
-      - name: Send GET request
+      - name: Send HEAD request
         env:
           RENDER_URL: ${{ secrets.RENDER_URL }}
         run: |
-          curl -X GET "$RENDER_URL" --max-time 5 --connect-timeout 3
+          curl -X HEAD "$RENDER_URL" --max-time 5 --connect-timeout 3
