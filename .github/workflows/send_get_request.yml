@@ -7,7 +7,7 @@ on:
   schedule: # https://qiita.com/tommy_aka_jps/items/5f4fe384008ffc9fa794
     - cron: "*/3 9-23 * * *" # 9:00-23:59 JSTの間、3分毎に実行
     - cron: "*/3 0-2 * * *" # 00:00-02:59 JSTの間、3分毎に実行
-  # workflow_dispatch: # 手動トリガーの追加
+  workflow_dispatch: # 手動トリガーの追加
 
 jobs:
   send_request:
