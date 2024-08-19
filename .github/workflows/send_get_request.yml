@@ -9,6 +9,7 @@ on:
 jobs:
   send_request:
     runs-on: ubuntu-latest
+    environment: FOR_RENDER  # 使用するEnvironmentを指定
 
     steps:
       - name: Send GET request
