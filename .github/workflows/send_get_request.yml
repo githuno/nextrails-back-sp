@@ -3,10 +3,10 @@ name: Send GET request to RENDER_URL
 on:
   push:
     branches:
-      - main
-  schedule:
-    - cron: "*/10 9-23 * * *" # 9:00-23:59 JSTの間、10分毎に実行
-    - cron: "*/10 0-2 * * *" # 00:00-02:59 JSTの間、10分毎に実行
+      - main # https://blog.cohu.dev/github-actions-cron-not-working/
+  schedule: # https://qiita.com/tommy_aka_jps/items/5f4fe384008ffc9fa794
+    - cron: "*/5 9-23 * * *" # 9:00-23:59 JSTの間、5分毎に実行
+    - cron: "*/5 0-2 * * *" # 00:00-02:59 JSTの間、5分毎に実行
   # workflow_dispatch: # 手動トリガーの追加
 
 jobs:
