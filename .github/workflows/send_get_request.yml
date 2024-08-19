@@ -16,4 +16,4 @@ jobs:
         env:
           RENDER_URL: ${{ secrets.RENDER_URL }}
         run: |
-          curl -X GET "$RENDER_URL"
+          curl -X GET "$RENDER_URL" --max-time 5 --connect-timeout 3
